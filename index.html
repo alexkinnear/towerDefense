@@ -1,13 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>Tower Defense</title>
-	<link rel="stylesheet" href="style.css">
-</head>
-<body>
-	<canvas id="id-canvas"
-			width = "1000" height = "1000"
-			style = "width: 75%; height: 75%; border-style: solid; border-width: 1px">
-	</canvas>
-	<script src="js/main.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Tower Defense</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="main-menu" class="screen active">
+            <h1 class="title">Tower Defense</h1>
+            <button id='new-game' class="menu-button">New Game</button>
+            <button id='high-scores' class="menu-button">High Scores</button>
+            <button id='controls' class="menu-button">Controls</button>
+            <button id='credits' class="menu-button">Credits</button>
+        </div>
+
+        <div id="high-scores-menu" class="screen">
+            <h1 class="title">High Scores</h1>
+            <ol id="high-scores-list" class="menu-item">
+                <li>--</li>
+                <li>--</li>
+                <li>--</li>
+                <li>--</li>
+                <li>--</li>
+            </ol>
+            <button id='high-scores-back' class="menu-button">Back</button>
+        </div>
+
+        <div id="controls-menu" class="screen">
+            <h1 class="title">Controls</h1>
+            <button id='up' class="menu-button">Move Up: Up Arrow</button>
+            <button id='left' class="menu-button">Move Left: Left Arrow</button>
+            <button id='down' class="menu-button">Move Down: Down Arrow</button>
+            <button id='right' class="menu-button">Move Right: Right Arrow</button>
+            <button id='fire' class="menu-button">Fire: Space Bar</button>
+            <button id='controls-back' class="menu-button">Back</button>
+        </div>
+
+        <div id="credits-menu" class="screen">
+            <h1 class="title">Credits</h1>
+            <div class="menu-item">Developed by: Sander Burton</div>
+            <div class="menu-item">Animation: Sander Burton</div>
+            <div class="menu-item">Menus: Sander Burton</div>
+            <div class="menu-item">Collision Detection: Sander Burton</div>
+            <div class="menu-item">Rendering: Sander Burton</div>
+            <div class="menu-item">Design: Sander Burton</div>
+            <div class="menu-item">Emotional Support: Carley Burton</div>
+            <div class="menu-item">Assets from 
+                <a href="https://www.pngkit.com/view/u2w7r5u2e6u2a9r5_general-sprites-centipede-arcade-game-sprites/">pngkit</a>
+            </div>
+            <button id='credits-back' class="menu-button">Back</button>
+        </div>
+        
+        <div id="game-screen" class="screen">
+            <canvas id="game-canvas" class="game-canvas" width="1000" height="1000"></canvas>
+        </div>
+        <script src="js/keyboard.js"></script>
+        <script src="js/menuScreens.js"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>

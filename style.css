@@ -1,0 +1,80 @@
+/* TODO: remove stuff that was unique to my centipede game */
+
+@font-face {
+    font-family: "Arcade";
+    src: url('assets/ARCADE.TTF') format('truetype');
+}
+
+html, body {
+    font-family: Arcade, Verdana, Geneva, Tahoma, sans-serif;
+    color:white;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    background-color: #333333;
+  }
+
+
+h1, h2, h3 {
+    margin: 0;
+    font-weight: unset;
+}
+
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    font-size: 8rem;
+    margin-top: 2rem;
+}
+
+.screen {
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-item {
+    margin-top: 2rem;
+    font-size: 2rem;
+}
+
+.menu-button {
+    background-color: #333333;
+    font-family: Arcade;
+    color:cadetblue;
+    margin-top: 2rem;
+    font-size: 3rem;
+    border: solid 0.2rem #333333;
+    border-radius: 0.3rem;
+    outline: none;
+}
+
+.menu-button:hover {
+    color:rgb(95, 160, 133);
+    border-bottom: double 0.2rem rgb(118, 201, 118);
+    cursor: pointer;
+}
+
+.menu-button:active {
+    color: rgb(77, 128, 107);
+}
+
+.game-canvas {
+    margin-top: 1%;
+    height: 95%;
+    border-width: 0.5%;
+    border-color: dimgray;
+    border-style: solid;
+    border-radius: 8px;
+}

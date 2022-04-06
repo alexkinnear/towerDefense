@@ -1,5 +1,5 @@
-
-let canvas = document.getElementById('id-canvas');
+// We could probably move this to our rendering file once we have one
+let canvas = document.getElementById('game-canvas');
 let context = canvas.getContext('2d');
 
 
@@ -8,6 +8,8 @@ let gameModel = {
     prevTime: 0,
     score: 0,
     sounds: {},
+    keyboard: Keyboard(),
+    activeScreen: document.getElementById('main-menu'), 
 
     update(elapsedTime) {
         this.prevTime = this.elapsedTime;
@@ -42,6 +44,6 @@ function gameLoop(timeStamp) {
 }
 
 
-
-
-gameLoop(performance.now())
+setupMenuButtons(gameModel);
+// The gameloop will start when the new game button is clicked on the main menu
+// gameLoop(performance.now())
