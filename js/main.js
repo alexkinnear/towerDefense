@@ -9,7 +9,24 @@ let gameModel = {
     score: 0,
     sounds: {},
     keyboard: Keyboard(),
-    activeScreen: document.getElementById('main-menu'), 
+    activeScreen: document.getElementById('main-menu'),
+    selectedTower: null,
+    currentLevel: 0,
+
+    upgradeSelected() {
+        // TODO: Implement this
+        console.log(selectedTower);
+    },
+
+    sellSelected() {
+        // TODO: Implement this
+        console.log(selectedTower);
+    },
+
+    startNextLevel() {
+        // TODO: Implement this
+        console.log(currentLevel + 1);
+    },
 
     update(elapsedTime) {
         this.prevTime = this.elapsedTime;
@@ -43,7 +60,8 @@ function gameLoop(timeStamp) {
     requestAnimationFrame(gameLoop);
 }
 
-
 setupMenuButtons(gameModel);
+
+
 // The gameloop will start when the new game button is clicked on the main menu
 // gameLoop(performance.now())

@@ -19,6 +19,7 @@ const Keyboard = () => {
     input.handlers[action] = onDown;
     input.keyToAction[key] = action;
     input.actionToKey[action] = key;
+    localStorage[action] = key;
   }
 
   input.unRegisterKey = (action) => {
