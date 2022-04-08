@@ -56,6 +56,7 @@ const setupMenuButtons = (game) => {
     console.log("starting new game");
 
     setScreen(gameScreen);
+    gameModel.newGame();
     prevTime = performance.now();
     gameLoop(performance.now());
   });
@@ -190,4 +191,15 @@ const setupMenuButtons = (game) => {
   sell.innerHTML = `Sell selected tower: ${keyToText(sellKey)}`;
   gameModel.keyboard.registerKey(nextLevelKey, gameModel.startNextLevel, 'nextLevelKey');
   nextLevel.innerHTML = `Start the next level: ${keyToText(nextLevelKey)}`;
+
+  // Set up the excape key to exit the game
+  const exitGame = () => {
+    if (gameModel.isRunning) {
+      console.log('exiting gameloop');
+      gameModel.isRunning = false;
+      setScreen(main.htmlElement);
+    }
+  }
+
+  gameModel.keyboard.registerKey('Escape', exitGame, 'exit');
 };

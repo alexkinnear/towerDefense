@@ -2,43 +2,8 @@
 let canvas = document.getElementById('game-canvas');
 let context = canvas.getContext('2d');
 
-
-let gameModel = {
-    elapsedTime: 0,
-    prevTime: 0,
-    score: 0,
-    sounds: {},
-    keyboard: Keyboard(),
-    activeScreen: document.getElementById('main-menu'),
-    selectedTower: null,
-    currentLevel: 0,
-
-    upgradeSelected() {
-        // TODO: Implement this
-        console.log(selectedTower);
-    },
-
-    sellSelected() {
-        // TODO: Implement this
-        console.log(selectedTower);
-    },
-
-    startNextLevel() {
-        // TODO: Implement this
-        console.log(currentLevel + 1);
-    },
-
-    update(elapsedTime) {
-        this.prevTime = this.elapsedTime;
-        this.elapsedTime += elapsedTime;
-    },
-
-    render() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        context.fill();
-    }
-}
+// The gameModel is created at startup and
+let gameModel = initializeGameModel();
 
 
 // Any active events are updated
@@ -54,14 +19,14 @@ function render() {
 function gameLoop(timeStamp) {
     elapsedTime = timeStamp - prevTime;
     prevTime = timeStamp;
+    // console.log("FPS: ", 1000 / elapsedTime);
     update(elapsedTime);
     render();
-    // new call to gameLoop
-    requestAnimationFrame(gameLoop);
+    if (gameModel.isRunning) {
+        // new call to gameLoop
+        requestAnimationFrame(gameLoop);
+    }
 }
 
 setupMenuButtons(gameModel);
-
-
 // The gameloop will start when the new game button is clicked on the main menu
-// gameLoop(performance.now())
