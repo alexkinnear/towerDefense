@@ -13,6 +13,7 @@ const initializeGameModel = () => {
       this.selectedTower = null;
       this.isRunning = true;
       this.currentLevel = 1;
+      this.grid = initializeGrid(8, 8);
     },
 
     upgradeSelected() {
@@ -36,9 +37,26 @@ const initializeGameModel = () => {
         this.keyboard.processInput();
     },
 
+  getPath() {
+      for (let row = 0; row < this.grid.length; row++) {
+          for (let col = 0; col < this.grid[row].length; col++) {
+              console.log(this.grid[row][col]);
+          }
+      }
+  },
+
+  drawArena() {
+      context.strokestyle = 'rgba(255, 0, 0, 1)';
+      context.lineWidth = 5;
+      context.beginPath();
+      context.moveTo(100, canvas.height / 2);
+      context.lineTo(300, canvas.height / 2);
+      context.stroke();
+  },
+
     render() {
         context.clearRect(0, 0, canvas.width, canvas.height);
-
+        this.drawArena();
         context.fill();
     },
   }
