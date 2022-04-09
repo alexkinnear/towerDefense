@@ -15,6 +15,7 @@ const initializeGameModel = () => {
       this.isRunning = true;
       this.currentLevel = 1;
       this.GRID_SIZE = 8;
+      this.displayGrid = false;
       this.grid = initializeGrid(this.GRID_SIZE, this.GRID_SIZE);
     },
 
@@ -41,8 +42,8 @@ const initializeGameModel = () => {
 
     render() {
         context.clearRect(0, 0, canvas.width, canvas.height);
+        if (this.displayGrid) {drawGrid();}
         drawArena();
-        context.fill();
     },
   }
 

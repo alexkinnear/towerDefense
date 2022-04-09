@@ -1,3 +1,4 @@
+
 const setupMenuButtons = (game) => {
 
   let {main, gameScreen, highScores, controls, credits} = {
@@ -202,4 +203,5 @@ const setupMenuButtons = (game) => {
   }
 
   gameModel.keyboard.registerKey('Escape', exitGame, 'exit');
+  gameModel.keyboard.registerKey('t', toggleGrid, 'toggleGrid')
 };
