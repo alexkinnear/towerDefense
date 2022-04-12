@@ -2,7 +2,7 @@
 function drawArena() {
     let offset = canvas.height / 10;
     context.strokeStyle = 'rgba(0, 130, 200, 1)';
-    context.lineWidth = 15;
+    context.lineWidth = 5;
     context.beginPath();
     context.moveTo(0, canvas.height / 2 + offset);
     context.lineTo(offset, canvas.height / 2 + offset);

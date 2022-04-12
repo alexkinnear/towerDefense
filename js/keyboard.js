@@ -2,6 +2,7 @@ const Keyboard = () => {
   let input = {
     pressedKeys: {},
     handlers: {},
+    alreadyExecuted: {},
     keyToAction: {},
     actionToKey: {},
   };
@@ -11,6 +12,7 @@ const Keyboard = () => {
   })
 
   window.addEventListener('keyup', (e) => {
+    input.alreadyExecuted[input.keyToAction[e.key]] = false;
     delete input.pressedKeys[e.key]
   })
 
@@ -19,6 +21,7 @@ const Keyboard = () => {
     input.handlers[action] = onDown;
     input.keyToAction[key] = action;
     input.actionToKey[action] = key;
+    input.alreadyExecuted[action] = false;
     localStorage[action] = key;
   }
 
@@ -26,9 +29,10 @@ const Keyboard = () => {
     if (input.actionToKey.hasOwnProperty(action)) {
       console.log('deleting key for ' + action)
       const key = input.actionToKey[action];
-      delete input.handlers[action]
-      delete input.actionToKey[action]
-      delete input.keyToAction[key]
+      delete input.handlers[action];
+      delete input.actionToKey[action];
+      delete input.keyToAction[key];
+      delete input.alreadyExecuted[action];
     }
   }
 
@@ -36,8 +40,9 @@ const Keyboard = () => {
     for (let key in input.pressedKeys) {
       if (input.keyToAction.hasOwnProperty(key)) {
         let action = input.keyToAction[key];
-        if (input.handlers.hasOwnProperty(action)) {
+        if (input.handlers.hasOwnProperty(action) && !input.alreadyExecuted[action]) {
           input.handlers[action](elapsed);
+          input.alreadyExecuted[action] = true;
         }
       }
     }

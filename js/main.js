@@ -1,4 +1,3 @@
-// We could probably move this to our rendering file once we have one
 let canvas = document.getElementById('game-canvas');
 let context = canvas.getContext('2d');
 

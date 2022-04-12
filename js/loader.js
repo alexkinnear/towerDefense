@@ -44,18 +44,74 @@
         }
     }
 
-    //
     // Load the groundCreep.png asset
+    // loadAsset(
+    //     'assets/groundCreep.png',
+    //     function(asset) {
+    //         console.log(`groundCreep.png loaded: ${asset.width}, ${asset.height}`);
+    //         console.log('asset: ', asset);
+    //         gameModel.assets['groundCreep'] = asset;
+    //     },
+    //     function(error) {
+    //         console.log('error: ', error);
+    //     }
+    // );
+
+    // Load all creep assets
+    const creepTypes = 3;
+    const creepColors = ['blue', 'green', 'red', 'yellow']
+    for (let creepType = 1; creepType <= creepTypes; creepType++) {
+        for (let color of creepColors) {
+            let frames = 4;
+            if (creepType === 1) frames = 6;
+
+            for (let frame = 1; frame <= frames; frame++) {
+                loadAsset(
+                    `assets/creep/creep-${creepType}-${color}/${frame}.png`,
+                    function(asset) {
+                        console.log(`creep-${creepType}-${color}/${frame}.png loaded: ${asset.width}, ${asset.height}`);
+                        // console.log('asset: ', asset);
+                        gameModel.assets[`creep-${creepType}-${color}/${frame}`] = asset;
+                    },
+                    function(error) {
+                        console.log('error: ', error);
+                    }
+                );
+            }
+        }
+    }
+
+    //load all tower types
+    const towerTypes = 7;
+    const towerLevels = 3;
+    for (let towerType = 1; towerType <= towerTypes; towerType++) {
+        let x = 400;
+        for (let towerLevel = 1; towerLevel <= towerLevels; towerLevel++) {
+            loadAsset(
+                `assets/tower-defense-turrets/turret-${towerType}-${towerLevel}.png`,
+                function(asset) {
+                    console.log(`turret-${towerType}-${towerLevel}.png loaded: ${asset.width}, ${asset.height}`);
+                    // console.log('asset: ', asset);
+                    gameModel.assets[`turret-${towerType}-${towerLevel}`] = asset;
+                },
+                function(error) {
+                    console.log('error: ', error);
+                }
+            );
+        }
+    }
+    // load tower base
     loadAsset(
-        '/assets/groundCreep.png',
+        `assets/tower-defense-turrets/turret-base.png`,
         function(asset) {
-            console.log(`groundCreep.png loaded: ${asset.width}, ${asset.height}`);
-            console.log('asset: ', asset);
-            gameModel.assets['groundCreep'] = asset;
+            console.log(`turret-base.png loaded: ${asset.width}, ${asset.height}`);
+            // console.log('asset: ', asset);
+            gameModel.assets[`turret-base`] = asset;
         },
         function(error) {
             console.log('error: ', error);
         }
     );
+    
 
 }());
