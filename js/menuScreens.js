@@ -203,5 +203,40 @@ const setupMenuButtons = (game) => {
   }
 
   gameModel.keyboard.registerKey('Escape', exitGame, 'exit');
-  gameModel.keyboard.registerKey('t', toggleGrid, 'toggleGrid')
+  gameModel.keyboard.registerKey('t', toggleGrid, 'toggleGrid');
+
+  // set up mouse listeners
+  let mouseCapture = false;
+  gameModel.keyboard.register('mousedown', function(e, elapsedTime) {
+    mouseCapture = true;
+    // myTexture.moveTo({ x : e.clientX - canvas.offsetLeft,
+    // y : e.clientY - canvas.offsetTop });
+  });
+  gameModel.keyboard.register('mouseup', function(e, elapsedTime) {
+    // logic for showing tower range and menu on click
+    if (gameModel.activeTowers) {
+      const clickPos = {
+        x : (e.clientX - canvas.offsetLeft) * canvas.width / canvas.clientWidth,
+        y : (e.clientY - canvas.offsetTop) * canvas.height / canvas.clientHeight
+      };
+      gameModel.selectedTower = null;
+      for (let tower of gameModel.activeTowers) {
+        const xDistSquared = Math.pow(clickPos.x - tower.center.x, 2);
+        const yDistSquared = Math.pow(clickPos.y - tower.center.y, 2);
+        const dist = Math.sqrt(xDistSquared + yDistSquared);
+        if (dist <= tower.size.x / 2) {
+          gameModel.selectedTower = tower;
+          break;
+        }
+      }
+    }
+    mouseCapture = false;
+  });
+  gameModel.keyboard.register('mousemove', function(e, elapsedTime) {
+    // logic for placing a new tower goes in here
+
+    // if (mouseCapture) {
+      
+    // }
+  });
 };

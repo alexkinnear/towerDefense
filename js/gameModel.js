@@ -28,11 +28,12 @@ const initializeGameModel = () => {
 
     addOneOfEachCreep() { // testing function
       const creepTypes = 3;
-      const creepColors = ['blue', 'green', 'red', 'yellow']
+      const creepColors = ['blue', 'green', 'red', 'yellow'];
+      const creepHealth = 20;
       for (let creepType = 1; creepType <= creepTypes; creepType++) {
         let x = 200;
         for (let color of creepColors) {
-          const newCreep = creep({x, y: creepType * 100 + 100}, `creep-${creepType}-${color}`);
+          const newCreep = creep({x, y: creepType * 100 + 100}, `creep-${creepType}-${color}`, creepHealth);
           this.activeCreeps.push(newCreep);
           x += 100;
         }
@@ -42,10 +43,11 @@ const initializeGameModel = () => {
     addOneOfEachTower() { // testing function
       const towerTypes = 7;
       const towerLevels = 3;
+      const towerRange = 200;
       for (let towerLevel = 1; towerLevel <= towerLevels; towerLevel++) {
         let x = 200;
         for (let towerType = 1; towerType <= towerTypes; towerType++) {
-          const newTower = tower({x, y: towerLevel * 100 + 400}, `turret-${towerType}-${towerLevel}`);
+          const newTower = tower({x, y: towerLevel * 100 + 400}, `turret-${towerType}-${towerLevel}`, towerRange);
           this.activeTowers.push(newTower);
           x += 100;
         }
@@ -80,12 +82,18 @@ const initializeGameModel = () => {
         context.clearRect(0, 0, canvas.width, canvas.height);
         if (this.displayGrid) {drawGrid();}
         drawArena();
-        for (let creep of this.activeCreeps) {
-          renderAnimatedTexture(creep);
-        }
         for (let tower of this.activeTowers) {
           renderTexture(tower.base);
           renderTexture(tower);
+        }
+        for (let creep of this.activeCreeps) {
+          renderAnimatedTexture(creep);
+        }
+        for (let creep of this.activeCreeps) {
+          drawHealthBar(50, 2, {x: creep.center.x, y: creep.center.y - 35}, creep.currentHealth / creep.maxHealth);
+        }
+        if (gameModel.selectedTower) {
+          drawTowerRange(gameModel.selectedTower);
         }
     },
   }

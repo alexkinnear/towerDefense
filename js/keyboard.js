@@ -5,6 +5,12 @@ const Keyboard = () => {
     alreadyExecuted: {},
     keyToAction: {},
     actionToKey: {},
+    mouseDown : [],
+    mouseUp : [],
+    mouseMove : [],
+    handlersDown : [],
+    handlersUp : [],
+    handlersMove : []
   };
 
   window.addEventListener('keydown', (e) => {
@@ -36,6 +42,28 @@ const Keyboard = () => {
     }
   }
 
+  input.register = (type, handler) => {
+    if (type === 'mousedown') {
+      input.handlersDown.push(handler);
+    }
+    else if (type === 'mouseup') {
+      input.handlersUp.push(handler);
+    }
+    else if (type === 'mousemove') {
+      input.handlersMove.push(handler);
+    }
+  }
+
+  canvas.addEventListener('mousedown', (e) => {
+    input.mouseDown.push(e);
+  });
+  canvas.addEventListener('mouseup', (e) => {
+    input.mouseUp.push(e);
+  });
+  canvas.addEventListener('mousemove', (e) => {
+    input.mouseMove.push(e);
+  });
+
   input.processInput = (elapsed) => {
     for (let key in input.pressedKeys) {
       if (input.keyToAction.hasOwnProperty(key)) {
@@ -46,6 +74,28 @@ const Keyboard = () => {
         }
       }
     }
-  }
+    // Mouse input code from class
+    // Process the mouse events for each of the different kinds of handlers
+    for (let event = 0; event < input.mouseDown.length; event++) {
+      for (let handler = 0; handler < input.handlersDown.length; handler++) {
+        input.handlersDown[handler](input.mouseDown[event], elapsed);
+      }
+    }
+    for (let event = 0; event < input.mouseUp.length; event++) {
+      for (let handler = 0; handler < input.handlersUp.length; handler++) {
+        input.handlersUp[handler](input.mouseUp[event], elapsed);
+      }
+    }
+    for (let event = 0; event < input.mouseMove.length; event++) {
+      for (let handler = 0; handler < input.handlersMove.length; handler++) {
+        input.handlersMove[handler](input.mouseMove[event], elapsed);
+      }
+    }
+    // Now that we have processed all the inputs, reset everything back to the empty state
+    input.mouseDown.length = 0;
+    input.mouseUp.length = 0;
+    input.mouseMove.length = 0;
+  };
+
   return input;
 };

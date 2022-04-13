@@ -1,10 +1,12 @@
 
-const creep = (pos, assetName) => {
+const creep = (pos, assetName, maxHealth) => {
   const frameTime = 125; // in ms
   return {
     center: pos,
     size: {x: 50, y: 50},
     rotation: 0,
+    maxHealth: maxHealth,
+    currentHealth: maxHealth,
     animationIndex: 1,
     animationFrameTime: frameTime,
     timeLeftOnCurrFrame: frameTime,
@@ -32,12 +34,14 @@ const towerBase = (pos) => {
   }
 }
 
-const tower = (pos, assetName) => {
+const tower = (pos, assetName, range) => {
   return {
     center: pos,
     size: {x: 50, y: 50},
     rotation: 0,
     rotationSpeed: 100, // not sure what this should be yet
+    range,
+    showMenu: false,
     assetName,
     base: towerBase(pos),
     update(elapsedTime) {
