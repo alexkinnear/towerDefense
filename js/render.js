@@ -19,7 +19,7 @@ const renderAnimatedTexture = (texture) => {
 const renderTexture = (texture) => {
   context.save()
 
-  let {center, size, rotation, assetName, animationIndex} = texture;
+  let {center, size, rotation, assetName} = texture;
   context.translate(center.x, center.y);
   context.rotate(rotation);
   context.translate(-center.x, -center.y);

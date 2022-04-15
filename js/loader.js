@@ -112,6 +112,19 @@
             console.log('error: ', error);
         }
     );
+
+    // load fire texture
+    loadAsset(
+        `assets/fire.png`,
+        function(asset) {
+            console.log(`fire.png loaded: ${asset.width}, ${asset.height}`);
+            // console.log('asset: ', asset);
+            gameModel.assets[`fireParticle`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
     
 
 }());

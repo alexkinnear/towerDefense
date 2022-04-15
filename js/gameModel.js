@@ -20,6 +20,7 @@ const initializeGameModel = () => {
       this.grid = initializeGrid(this.GRID_SIZE, this.GRID_SIZE);
       this.activeCreeps = [];
       this.activeTowers = [];
+      this.exlosionParticleSystems = [];
       // createGroundCreep('assets/groundCreep.png', 50, 50, {x: 50, y: 50});
       // for testing, remove these
       this.addOneOfEachCreep();
@@ -76,6 +77,14 @@ const initializeGameModel = () => {
         for (let creep of this.activeCreeps) {
           creep.update(elapsedTime);
         }
+        for (let i = 0; i < this.exlosionParticleSystems.length; i++) {
+          const system = this.exlosionParticleSystems[i];
+          system.update(elapsedTime);
+          if (system.timeEmitting > system.duration + system.avgLifetime) {
+            this.exlosionParticleSystems.splice(i, 1); // remove the particle system
+            i--; // modified the array mid-loop, so decrement the counter
+          }
+        }
     },
 
     render() {
@@ -94,6 +103,13 @@ const initializeGameModel = () => {
         }
         if (gameModel.selectedTower) {
           drawTowerRange(gameModel.selectedTower);
+        }
+
+        for (let system of this.exlosionParticleSystems) {
+          Object.getOwnPropertyNames(system.particles).forEach( function(value) {
+            let particle = system.particles[value];
+            renderTexture(particle);
+          });
         }
     },
   }

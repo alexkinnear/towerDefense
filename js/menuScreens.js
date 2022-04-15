@@ -214,11 +214,11 @@ const setupMenuButtons = (game) => {
   });
   gameModel.keyboard.register('mouseup', function(e, elapsedTime) {
     // logic for showing tower range and menu on click
+    const clickPos = {
+      x : (e.clientX - canvas.offsetLeft) * canvas.width / canvas.clientWidth,
+      y : (e.clientY - canvas.offsetTop) * canvas.height / canvas.clientHeight
+    };
     if (gameModel.activeTowers) {
-      const clickPos = {
-        x : (e.clientX - canvas.offsetLeft) * canvas.width / canvas.clientWidth,
-        y : (e.clientY - canvas.offsetTop) * canvas.height / canvas.clientHeight
-      };
       gameModel.selectedTower = null;
       for (let tower of gameModel.activeTowers) {
         const xDistSquared = Math.pow(clickPos.x - tower.center.x, 2);
@@ -230,6 +230,17 @@ const setupMenuButtons = (game) => {
         }
       }
     }
+    // testing particle system creation and duration
+    gameModel.exlosionParticleSystems.push(
+      ParticleSystem({
+        center: { x: clickPos.x, y: clickPos.y },
+        size: { mean: 10, stdev: 4 },
+        speed: { mean: 200, stdev: 40 },
+        lifetime: { mean: 0.2, stdev: 0.1 },
+        assetName: 'fireParticle',
+        duration: 0.2
+      }),
+    );
     mouseCapture = false;
   });
   gameModel.keyboard.register('mousemove', function(e, elapsedTime) {
