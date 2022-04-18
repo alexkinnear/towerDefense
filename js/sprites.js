@@ -25,7 +25,9 @@ function updateCreepPos(creep) {
 
 const creep = (pos, assetName, maxHealth) => {
   const frameTime = 125; // in ms
+  gameModel.creepId++;
   return {
+    id: gameModel.creepId,
     center: pos,
     size: {x: 40, y: 40},
     speed: 0.5,
@@ -45,6 +47,14 @@ const creep = (pos, assetName, maxHealth) => {
       this.timeLeftOnCurrFrame -= elapsedTime;
       this.elapsedTime += elapsedTime;
       updateCreepPos(this);
+
+      if (typeof this.canvasEnd !== 'undefined') {
+        if (Math.abs(this.center.x - this.canvasEnd.x) < 0.5 && Math.abs(this.center.y - this.canvasEnd.y) < 0.5) {
+          let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
+          gameModel.activeCreeps.splice(idx, 1);
+        }
+      }
+
       if (this.timeLeftOnCurrFrame <= 0) {
         this.animationIndex = this.animationIndex + 1;
         if (this.animationIndex === this.numOfFrames + 1) {

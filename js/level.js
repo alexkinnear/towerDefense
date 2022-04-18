@@ -68,6 +68,12 @@ function createLevel(id, entrance, exit, howManyCreeps, startTime, duration) {
     gridPos['top'] = {row: 0, col: Math.floor(gameModel.GRID_SIZE / 2 - 1)};
     gridPos['bottom'] = {row: gameModel.GRID_SIZE-1, col: Math.floor(gameModel.GRID_SIZE / 2 - 1)}
 
+    let canvasPos = {};
+    canvasPos['left'] = {x: 0, y: canvas.height / 2};
+    canvasPos['right'] = {x: canvas.width, y: canvas.height / 2};
+    canvasPos['top'] = {x: canvas.width / 2, y: 0};
+    canvasPos['bottom'] = {x: canvas.width / 2, y: canvas.height};
+
     // fill out the creeps list with the level's creeps
     gameModel.activeCreeps = createCreeps(howManyCreeps);
     let path = getShortestPath(gridPos[entrance], gridPos[exit]);
@@ -76,6 +82,7 @@ function createLevel(id, entrance, exit, howManyCreeps, startTime, duration) {
         gameModel.activeCreeps[i].enterTime = duration * Random.nextDouble();
         gameModel.activeCreeps[i].path = JSON.parse(JSON.stringify(path)); // Deep copy
         gameModel.activeCreeps[i].path.unshift('end');
+        gameModel.activeCreeps[i].canvasEnd = canvasPos[exit];
         setCreepPos(gameModel.activeCreeps[i], entrance);
     }
     return {
