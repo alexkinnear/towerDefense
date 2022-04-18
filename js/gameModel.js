@@ -17,14 +17,15 @@ const initializeGameModel = () => {
       this.currentLevel = 1;
       this.GRID_SIZE = 16;
       this.displayGrid = false;
+      this.GRID_OFFSET = canvas.height / 10;
       this.grid = initializeGrid(this.GRID_SIZE, this.GRID_SIZE);
       this.activeCreeps = [];
       this.activeTowers = [];
-      this.exlosionParticleSystems = [];
+      this.explosionParticleSystems = [];
       // createGroundCreep('assets/groundCreep.png', 50, 50, {x: 50, y: 50});
       // for testing, remove these
-      this.addOneOfEachCreep();
-      this.addOneOfEachTower();
+      // this.addOneOfEachCreep();
+      // this.addOneOfEachTower();
     },
 
     addOneOfEachCreep() { // testing function
@@ -67,7 +68,8 @@ const initializeGameModel = () => {
 
     startNextLevel() {
         // TODO: Implement this
-        console.log(this.currentLevel + 1);
+        this.levelInfo = createLevel(1, 'left', 'bottom', 10, 0, 30);
+        console.log(this.levelInfo);
     },
 
     update(elapsedTime) {
@@ -77,11 +79,11 @@ const initializeGameModel = () => {
         for (let creep of this.activeCreeps) {
           creep.update(elapsedTime);
         }
-        for (let i = 0; i < this.exlosionParticleSystems.length; i++) {
-          const system = this.exlosionParticleSystems[i];
+        for (let i = 0; i < this.explosionParticleSystems.length; i++) {
+          const system = this.explosionParticleSystems[i];
           system.update(elapsedTime);
           if (system.timeEmitting > system.duration + system.avgLifetime) {
-            this.exlosionParticleSystems.splice(i, 1); // remove the particle system
+            this.explosionParticleSystems.splice(i, 1); // remove the particle system
             i--; // modified the array mid-loop, so decrement the counter
           }
         }
@@ -105,7 +107,7 @@ const initializeGameModel = () => {
           drawTowerRange(gameModel.selectedTower);
         }
 
-        for (let system of this.exlosionParticleSystems) {
+        for (let system of this.explosionParticleSystems) {
           Object.getOwnPropertyNames(system.particles).forEach( function(value) {
             let particle = system.particles[value];
             renderTexture(particle);

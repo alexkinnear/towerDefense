@@ -1,6 +1,6 @@
 // Draws the main area for tower defense with exits north, south, east, and west
 function drawArena() {
-    let offset = canvas.height / 10;
+    let offset = gameModel.GRID_OFFSET;
     context.strokeStyle = 'rgba(0, 130, 200, 1)';
     context.lineWidth = 5;
     context.beginPath();
@@ -33,7 +33,7 @@ function drawArena() {
 function drawGrid() {
     context.strokeStyle = 'rgba(255, 255, 255, 1)';
     context.lineWidth = 1;
-    let offset = canvas.height / 10;
+    let offset = gameModel.GRID_OFFSET;
     let cellSize = (canvas.width - offset * 2) / gameModel.GRID_SIZE;
 
     context.beginPath();

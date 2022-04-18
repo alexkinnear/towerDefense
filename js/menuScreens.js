@@ -231,7 +231,7 @@ const setupMenuButtons = (game) => {
       }
     }
     // testing particle system creation and duration
-    gameModel.exlosionParticleSystems.push(
+    gameModel.explosionParticleSystems.push(
       ParticleSystem({
         center: { x: clickPos.x, y: clickPos.y },
         size: { mean: 10, stdev: 4 },

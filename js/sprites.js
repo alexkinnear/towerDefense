@@ -1,19 +1,50 @@
 
+function updateCreepPos(creep) {
+  if (creep.nextPos === null && creep.elapsedTime / 1000 >= creep.enterTime) {
+    getNextPos(creep);
+  }
+  if (creep.nextPos != null) {
+    if (Math.abs(creep.center.x - creep.nextPos.x) < 1 && Math.abs(creep.center.y - creep.nextPos.y) < 1) {
+
+      getNextPos(creep);
+    }
+    if (creep.center.x < creep.nextPos.x) {
+      creep.center.x += creep.speed;
+    }
+    else {
+      creep.center.x -= creep.speed;
+    }
+    if (creep.center.y < creep.nextPos.y) {
+      creep.center.y += creep.speed;
+    }
+    else {
+      creep.center.y -= creep.speed;
+    }
+  }
+}
+
 const creep = (pos, assetName, maxHealth) => {
   const frameTime = 125; // in ms
   return {
     center: pos,
-    size: {x: 50, y: 50},
+    size: {x: 40, y: 40},
+    speed: 0.5,
     rotation: 0,
     maxHealth: maxHealth,
     currentHealth: maxHealth,
     animationIndex: 1,
+    nextPos: null,
+    elapsedTime: 0,
+    enterTime: Math.pow(10, 1000),
+    path: [],
     animationFrameTime: frameTime,
     timeLeftOnCurrFrame: frameTime,
     numOfFrames: assetName.startsWith('creep-1') ? 6 : 4, // creep-1 has 6 frames, others have 4
     assetName,
     update(elapsedTime) {
       this.timeLeftOnCurrFrame -= elapsedTime;
+      this.elapsedTime += elapsedTime;
+      updateCreepPos(this);
       if (this.timeLeftOnCurrFrame <= 0) {
         this.animationIndex = this.animationIndex + 1;
         if (this.animationIndex === this.numOfFrames + 1) {
@@ -21,6 +52,8 @@ const creep = (pos, assetName, maxHealth) => {
         }
         this.timeLeftOnCurrFrame = this.animationFrameTime + this.timeLeftOnCurrFrame; // offsets based on the now negative remaining frame time
       }
+
+
     },
   }
 };

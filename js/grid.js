@@ -92,12 +92,6 @@ function getShortestPath(start, end) {
     return [];
 }
 
-// display the 2d array to stdout
-function display() {
-    for (let i = 0; i < gameModel.grid.length; i++) {
-        for (let j = 0; j < gameModel.grid[i].length; j++) {
-            process.stdout.write(gameModel.grid[i][j] + ' ');
-        }
-        process.stdout.write('\n');
-    }
-}
+
+
+
