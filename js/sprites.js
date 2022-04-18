@@ -77,13 +77,19 @@ const towerBase = (pos) => {
   }
 }
 
-const tower = (pos, assetName, range) => {
+const tower = (pos, assetName, {airRange, groundRange, damage, fireRate, price, effect, name}) => {
   return {
     center: pos,
     size: {x: 50, y: 50},
     rotation: 0,
     rotationSpeed: 100, // not sure what this should be yet
-    range,
+    airRange,
+    groundRange,
+    price,
+    damage,
+    fireRate,
+    effect,
+    name,
     showMenu: false,
     assetName,
     base: towerBase(pos),
@@ -92,4 +98,58 @@ const tower = (pos, assetName, range) => {
     },
   }
 };
+
+// Some configuration constants to make it easier to tweak the game balance
+const gunnerStats = {
+  airRange: null,
+  groundRange: 200,
+  damage: 10,
+  fireRate: 2,
+  price: 25,
+  effect: null,
+  name: 'Gunner',
+}
+const bomberStats = {
+  airRange: null,
+  groundRange: 200,
+  damage: 50,
+  fireRate: 0.5,
+  price: 100,
+  effect: 'Explodes',
+  name: 'Bomber',
+}
+const airSeekerStats = {
+  airRange: 200,
+  groundRange: null,
+  damage: 30,
+  fireRate: 1,
+  price: 100,
+  effect: null,
+  name: 'Air Seeker',
+}
+const heatSeekerStats = {
+  airRange: 250,
+  groundRange: 175,
+  damage: 25,
+  fireRate: 1.2,
+  price: 200,
+  effect: null,
+  name: 'Heat Seeker',
+}
+
+const gunner = (pos) => {
+  return tower(pos, 'turret-4-1', gunnerStats);
+}
+
+const bomber = (pos) => {
+  return tower(pos, 'turret-3-1', bomberStats);
+}
+
+const airSeeker = (pos) => {
+  return tower(pos, 'turret-5-1', airSeekerStats);
+}
+
+const heatSeeker = (pos) => {
+  return tower(pos, 'turret-7-1', heatSeekerStats);
+}
 

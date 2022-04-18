@@ -22,11 +22,10 @@ const initializeGameModel = () => {
       this.creepId = 0;
       this.activeCreeps = [];
       this.activeTowers = [];
+      this.placingTower = null;
       this.explosionParticleSystems = [];
-      // createGroundCreep('assets/groundCreep.png', 50, 50, {x: 50, y: 50});
-      // for testing, remove these
-      // this.addOneOfEachCreep();
-      // this.addOneOfEachTower();
+      this.towerMenu = initializeTowerMenu();
+      this.currentMoney = 1000;
     },
 
     addOneOfEachCreep() { // testing function
@@ -113,6 +112,13 @@ const initializeGameModel = () => {
             let particle = system.particles[value];
             renderTexture(particle);
           });
+        }
+
+        drawTowerMenu(gameModel.towerMenu);
+        if (gameModel.placingTower) {
+          renderTexture(gameModel.placingTower.base);
+          renderTexture(gameModel.placingTower);
+          drawTowerRange(gameModel.placingTower);
         }
     },
   }

@@ -205,12 +205,27 @@ const setupMenuButtons = (game) => {
   gameModel.keyboard.registerKey('Escape', exitGame, 'exit');
   gameModel.keyboard.registerKey('t', toggleGrid, 'toggleGrid');
 
+  const mouseCollidesWithRect = (mousePos, sprite) => {
+    const halfX = sprite.size.x / 2;
+    const halfY = sprite.size.y / 2;
+    return (
+      mousePos.x > sprite.center.x - halfX &&
+      mousePos.x < sprite.center.x + halfX &&
+      mousePos.y > sprite.center.y - halfY &&
+      mousePos.y < sprite.center.y + halfY
+    );
+  }
+
   // set up mouse listeners
   let mouseCapture = false;
   gameModel.keyboard.register('mousedown', function(e, elapsedTime) {
     mouseCapture = true;
-    // myTexture.moveTo({ x : e.clientX - canvas.offsetLeft,
-    // y : e.clientY - canvas.offsetTop });
+    if (gameModel.towerMenu.hovered) {
+      // copy the sprite from the menu into placingTower
+      const hoveredSprite = gameModel.towerMenu.hovered;
+      gameModel.placingTower = {...hoveredSprite, base: {...hoveredSprite.base}};
+
+    }
   });
   gameModel.keyboard.register('mouseup', function(e, elapsedTime) {
     // logic for showing tower range and menu on click
@@ -221,6 +236,7 @@ const setupMenuButtons = (game) => {
     if (gameModel.activeTowers) {
       gameModel.selectedTower = null;
       for (let tower of gameModel.activeTowers) {
+        // circle mouse collision
         const xDistSquared = Math.pow(clickPos.x - tower.center.x, 2);
         const yDistSquared = Math.pow(clickPos.y - tower.center.y, 2);
         const dist = Math.sqrt(xDistSquared + yDistSquared);
@@ -230,24 +246,42 @@ const setupMenuButtons = (game) => {
         }
       }
     }
-    // testing particle system creation and duration
-    gameModel.explosionParticleSystems.push(
-      ParticleSystem({
-        center: { x: clickPos.x, y: clickPos.y },
-        size: { mean: 10, stdev: 4 },
-        speed: { mean: 200, stdev: 40 },
-        lifetime: { mean: 0.2, stdev: 0.1 },
-        assetName: 'fireParticle',
-        duration: 0.2
-      }),
-    );
-    mouseCapture = false;
-  });
-  gameModel.keyboard.register('mousemove', function(e, elapsedTime) {
-    // logic for placing a new tower goes in here
 
-    // if (mouseCapture) {
-      
-    // }
+    if (gameModel.placingTower) {
+      attemptToPlace(gameModel.placingTower);
+      gameModel.placingTower = null;
+    }
+    mouseCapture = false;
+    // code to start a particle system, for when we need it
+    // gameModel.explosionParticleSystems.push(
+    //   ParticleSystem({
+    //     center: { x: clickPos.x, y: clickPos.y },
+    //     size: { mean: 10, stdev: 4 },
+    //     speed: { mean: 200, stdev: 40 },
+    //     lifetime: { mean: 0.2, stdev: 0.1 },
+    //     assetName: 'fireParticle',
+    //     duration: 0.2
+    //   }),
+    // );
+  });
+
+  gameModel.keyboard.register('mousemove', function(e, elapsedTime) {
+    // detect menu hover
+    const mousePos = {
+      x : (e.clientX - canvas.offsetLeft) * canvas.width / canvas.clientWidth,
+      y : (e.clientY - canvas.offsetTop) * canvas.height / canvas.clientHeight
+    };
+    gameModel.towerMenu.hovered = null;
+    for (let towerSprite of gameModel.towerMenu.towerSprites) {
+      if (mouseCollidesWithRect(mousePos, towerSprite)) {
+        gameModel.towerMenu.hovered = towerSprite;
+      }
+    }
+
+    // logic for placing a new tower goes in here
+    if (gameModel.placingTower) {
+      gameModel.placingTower.base.center = mousePos;
+      gameModel.placingTower.center = mousePos;
+    }
   });
 };
