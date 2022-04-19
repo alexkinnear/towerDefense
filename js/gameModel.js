@@ -14,7 +14,6 @@ const initializeGameModel = () => {
       this.score = 0;
       this.selectedTower = null;
       this.isRunning = true;
-      this.currentLevel = 1;
       this.GRID_SIZE = 16;
       this.displayGrid = false;
       this.GRID_OFFSET = canvas.height / 10;
@@ -26,6 +25,8 @@ const initializeGameModel = () => {
       this.explosionParticleSystems = [];
       this.towerMenu = initializeTowerMenu();
       this.currentMoney = 1000;
+      this.currentLevel = createLevel(1, 'left', 'right', 10, 30);
+      this.startLevel = false;
     },
 
     addOneOfEachCreep() { // testing function
@@ -67,8 +68,7 @@ const initializeGameModel = () => {
     },
 
     startNextLevel() {
-        // TODO: Implement this
-        this.levelInfo = createLevel(1, 'left', 'top', 10, 0, 30);
+        gameModel.startLevel = true;
     },
 
     update(elapsedTime) {
@@ -76,7 +76,7 @@ const initializeGameModel = () => {
         this.elapsedTime += elapsedTime;
         this.keyboard.processInput();
         for (let creep of this.activeCreeps) {
-          creep.update(elapsedTime);
+            creep.update(elapsedTime);
         }
         for (let i = 0; i < this.explosionParticleSystems.length; i++) {
           const system = this.explosionParticleSystems[i];

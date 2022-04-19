@@ -71,7 +71,7 @@ function getNextPos(creep) {
     }
 }
 
-function createLevel(id, entrance, exit, howManyCreeps, startTime, duration) {
+function createLevel(id, entrance, exit, howManyCreeps, duration) {
     let gridPos = {};
     gridPos['left'] = {row: Math.floor(gameModel.GRID_SIZE / 2), col: 0};
     gridPos['right'] = {row: Math.floor(gameModel.GRID_SIZE / 2), col: gameModel.GRID_SIZE-1};
@@ -99,7 +99,7 @@ function createLevel(id, entrance, exit, howManyCreeps, startTime, duration) {
         id: id,
         entrance: gridPos[entrance],
         exit: gridPos[exit],
-        startTime: startTime,
+        startTime: 0,
         elapsedTime: 0
     }
 }

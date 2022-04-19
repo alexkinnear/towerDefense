@@ -15,7 +15,7 @@ function isOpenSpace(row, col) {
     if (row < 0 || col < 0 || row >= gameModel.grid.length || col >= gameModel.grid[row].length) {
         return false;
     }
-    return gameModel.grid[row][col].length === 0;
+    return gameModel.grid[row][col].length === 0 || !gameModel.grid[row][col][0].hasOwnProperty('price');
 }
 
 // Gets the distance between current pos and end without consideration for obstacles
@@ -73,7 +73,7 @@ function getPath(visited) {
 // Greedy solution that returns objects with position of the shortest path
 function getShortestPath(start, end) {
     if (!isOpenSpace(start.row, start.col) || !isOpenSpace(end.row, end.col)) {
-        return false;
+        return [];
     }
     let visited = [];
     let queue = [];

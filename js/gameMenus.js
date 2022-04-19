@@ -35,7 +35,7 @@ const attemptToPlace = (tower) => {
       gameModel.currentMoney -= tower.price;
 
       // updateCreepPaths having some issues
-      // updateCreepPaths();
+      updateCreepPaths();
     }
   }
 }

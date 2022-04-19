@@ -68,11 +68,14 @@ function updateCreepAngle(creep) {
 function updateCreepPaths() {
   for (let i = 0; i < gameModel.activeCreeps.length; i++) {
     let creep = gameModel.activeCreeps[i];
-    console.log(creep.path);
-    creep.path = getShortestPath(creep.path[creep.path.length-1], creep.path[1]);
-    if (creep.path.constructor === Array) {
-      creep.path.unshift('end');
+    if (creep.gridPos.row === -1) {
+      creep.path = getShortestPath(gameModel.currentLevel.entrance, gameModel.currentLevel.exit);
     }
+    else {
+      creep.path = getShortestPath(creep.gridPos, gameModel.currentLevel.exit);
+      console.log(creep.path);
+    }
+    creep.path.unshift('end');
   }
 }
 
@@ -83,7 +86,6 @@ function updateCreepPos(creep) {
   }
   if (creep.nextPos != null) {
     if (Math.abs(creep.center.x - creep.nextPos.x) < 1 && Math.abs(creep.center.y - creep.nextPos.y) < 1) {
-
       getNextPos(creep);
     }
     if (creep.center.x < creep.nextPos.x) {
@@ -149,10 +151,13 @@ const creep = (pos, assetName, maxHealth) => {
     assetName,
     update(elapsedTime) {
       this.timeLeftOnCurrFrame -= elapsedTime;
-      this.elapsedTime += elapsedTime;
-      updateCreepPos(this);
-      updateCreepGridPos(this);
-      updateCreepAngle(this);
+      console.log(gameModel.startLevel);
+      if (gameModel.startLevel) {
+        this.elapsedTime += elapsedTime;
+        updateCreepPos(this);
+        updateCreepGridPos(this);
+        updateCreepAngle(this);
+      }
 
       if (typeof this.canvasEnd !== 'undefined') {
         if (Math.abs(this.center.x - this.canvasEnd.x) < 0.5 && Math.abs(this.center.y - this.canvasEnd.y) < 0.5) {
