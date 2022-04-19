@@ -151,7 +151,7 @@ const creep = (pos, assetName, maxHealth) => {
     assetName,
     update(elapsedTime) {
       this.timeLeftOnCurrFrame -= elapsedTime;
-      console.log(gameModel.startLevel);
+      // console.log(gameModel.startLevel);
       if (gameModel.startLevel) {
         this.elapsedTime += elapsedTime;
         updateCreepPos(this);
@@ -188,7 +188,8 @@ const towerBase = (pos) => {
   }
 }
 
-const tower = (pos, assetName, {airRange, groundRange, damage, fireRate, price, effect, name}) => {
+const tower = (pos,
+  {airRange, groundRange, damage, fireRate, price, effect, name, sprites, upgradePaths}) => {
   return {
     center: pos,
     size: {x: 50, y: 50},
@@ -201,17 +202,37 @@ const tower = (pos, assetName, {airRange, groundRange, damage, fireRate, price, 
     fireRate,
     effect,
     name,
-    showMenu: false,
-    assetName,
+    level: 1,
+    chosenUpgradePath: null,
+    upgradePaths,
+    sprites,
+    assetName: sprites[0],
     base: towerBase(pos),
     update(elapsedTime) {
       // point the tower at the right creep
     },
+    upgrade(upgradePath) {
+      const nextUpgrade = this.upgradePaths[upgradePath][this.level - 1]
+      const changingAttribute = Object.keys(nextUpgrade)[0];
+
+      if (gameModel.currentMoney >= this.price) {
+        gameModel.currentMoney -= nextUpgrade.price;
+        this.level += 1;
+        this.assetName = this.sprites[this.level - 1];
+        this[changingAttribute] = nextUpgrade[changingAttribute];
+        if (this.chosenUpgradePath === null) {
+          this.chosenUpgradePath = upgradePath;
+        }
+        gameModel.selectedTowerMenu = initializeSelectedTowerMenu(this);
+      }
+    }
   }
 };
 
 // Some configuration constants to make it easier to tweak the game balance
-const gunnerStats = {
+// The upgrade paths are lists of objects showing which attribute changes for that upgrade, and the price of the upgrade
+// sprites are in order of level e.g. lvl 1, 2, 3
+const gunnerSpec = {
   airRange: null,
   groundRange: 200,
   damage: 10,
@@ -219,48 +240,72 @@ const gunnerStats = {
   price: 25,
   effect: null,
   name: 'Gunner',
+  sprites: ['turret-4-1', 'turret-4-2', 'turret-4-3'],
+  upgradePaths: [
+    [{damage: 15, price: 25}, {effect: 'Slow', price: 40}], // path 0
+    [{fireRate: 3, price: 25}, {effect: 'Triple Shot', price: 50}], // path 1
+    [{groundRange: 250, price: 25}, {groundRange: 300, price: 30}], // path 2
+  ],
 }
-const bomberStats = {
+const bomberSpec = {
   airRange: null,
   groundRange: 200,
-  damage: 50,
+  damage: 40,
   fireRate: 0.5,
-  price: 100,
+  price: 90,
   effect: 'Explodes',
   name: 'Bomber',
+  sprites: ['turret-3-1', 'turret-3-2', 'turret-3-3'],
+  upgradePaths: [
+    [{damage: 60, price: 80}, {effect: 'Shrapnel', price: 120}], // path 0
+    [{fireRate: 1, price: 100}, {effect: 'Poison Bomb', price: 130}], // path 1
+    [{groundRange: 250, price: 50}, {effect: 'Cluster Bomb', price: 150}], // path 2
+  ],
 }
-const airSeekerStats = {
+const airSeekerSpec = {
   airRange: 200,
   groundRange: null,
   damage: 30,
   fireRate: 1,
-  price: 100,
+  price: 70,
   effect: null,
   name: 'Air Seeker',
+  sprites: ['turret-5-1', 'turret-5-2', 'turret-5-3'],
+  upgradePaths: [
+    [{damage: 50, price: 80}, {airRange: 325, price: 80}], // path 0
+    [{fireRate: 1.5, price: 50}, {effect: 'Two Shot', price: 120}], // path 1
+    [{airRange: 300, price: 80}, {effect: 'Sonic Missiles', price: 50}], // path 2
+  ],
 }
-const heatSeekerStats = {
-  airRange: 250,
+const heatSeekerSpec = {
+  airRange: 225,
   groundRange: 175,
   damage: 25,
   fireRate: 1.2,
-  price: 200,
+  price: 140,
   effect: null,
   name: 'Heat Seeker',
+  sprites: ['turret-7-1', 'turret-7-2', 'turret-7-3'],
+  upgradePaths: [
+    [{damage: 40, price: 80}, {airRange: 300, price: 110}], // path 0
+    [{groundRange: 250, price: 70}, {airRange: 300, price: 120}], // path 1
+    [{airRange: 275, price: 80}, {damage: 50, price: 120}], // path 2
+  ],
 }
 
 const gunner = (pos) => {
-  return tower(pos, 'turret-4-1', gunnerStats);
+  return tower(pos, gunnerSpec);
 }
 
 const bomber = (pos) => {
-  return tower(pos, 'turret-3-1', bomberStats);
+  return tower(pos, bomberSpec);
 }
 
 const airSeeker = (pos) => {
-  return tower(pos, 'turret-5-1', airSeekerStats);
+  return tower(pos, airSeekerSpec);
 }
 
 const heatSeeker = (pos) => {
-  return tower(pos, 'turret-7-1', heatSeekerStats);
+  return tower(pos, heatSeekerSpec);
 }
 

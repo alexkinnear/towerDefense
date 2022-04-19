@@ -109,6 +109,26 @@ const drawText = (text, pos, font, fillColor, strokeColor, rotation) => {
   context.restore();
 };
 
+const menuColors = {
+  name: 'white',
+  damage: 'lightcoral',
+  fireRate: 'orange',
+  groundRange: 'lightgreen',
+  airRange: 'cyan',
+  price: 'yellow',
+  effect: 'gainsboro',
+}
+
+const humanTexts = {
+  damage: 'Damage',
+  fireRate: 'Shots/Second',
+  groundRange: 'Ground Range',
+  airRange: 'Air Range',
+  effect: 'Effect',
+}
+
+const menuFont = '32px Arcade';
+
 const drawTowerMenu = (towerMenu) => {
   // tower icons
   for (let i = 0; i < towerMenu.towerSprites.length; i++) {
@@ -124,14 +144,44 @@ const drawTowerMenu = (towerMenu) => {
     const menuSize = {x: 275, y: 200};
     const menuTopLeft = {x: menuCenter.x - menuSize.x / 2, y: menuCenter.y - menuSize.y / 2}
     drawRectangle(menuSize, menuCenter, "#777777");
-    drawText(`${hovered.name}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y}, '32px Arcade', 'white', 'black', 0);
-    drawText(`${hovered.damage} Damage`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 25}, '32px Arcade', 'lightcoral', 'black', 0);
-    drawText(`${hovered.fireRate} Shots/Second`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 50}, '32px Arcade', 'orange', 'black', 0);
-    drawText(`${hovered.groundRange || 'No'} Ground Range`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 75}, '32px Arcade', 'lightgreen', 'black', 0);
-    drawText(`${hovered.airRange || 'No'} Air Range`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 100}, '32px Arcade', 'cyan', 'black', 0);
-    drawText(`$${hovered.price}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 125}, '32px Arcade', 'yellow', 'black', 0);
-    drawText(`${hovered.effect || ''}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 150}, '32px Arcade', 'gainsboro', 'black', 0);
+    drawText(hovered.name, {x: menuTopLeft.x + 12, y: menuTopLeft.y}, menuFont, menuColors.name, 'black', 0);
+    drawText(`${hovered.damage} ${humanTexts.damage}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 25}, menuFont, menuColors.damage, 'black', 0);
+    drawText(`${hovered.fireRate} ${humanTexts.fireRate}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 50}, menuFont, menuColors.fireRate, 'black', 0);
+    drawText(`${hovered.groundRange || 'No'} ${humanTexts.groundRange}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 75}, menuFont, menuColors.groundRange, 'black', 0);
+    drawText(`${hovered.airRange || 'No'} ${humanTexts.airRange}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 100}, menuFont, menuColors.airRange, 'black', 0);
+    drawText(`$${hovered.price}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 125}, menuFont, menuColors.price, 'black', 0);
+    drawText(`${hovered.effect || ''}`, {x: menuTopLeft.x + 12, y: menuTopLeft.y + 150}, menuFont, menuColors.effect, 'black', 0);
   }
   // current $$
-  drawText(`$${gameModel.currentMoney}`, {x: 12, y: 0}, '48px Arcade', 'yellow', 'black', 0);
+  drawText(`$${gameModel.currentMoney}`, {x: 12, y: 0}, menuFont, 'yellow', 'black', 0);
+}
+
+const drawUpgradeMenu = (upgradePath, selectedTowerMenu, tower) => {
+  let {center, size, changingAttribute, upgradeText, upgradeButton} = selectedTowerMenu.upgradeMenus[upgradePath];
+  let topLeft = {x: center.x - size.x / 2, y: center.y - size.y / 2}
+  drawRectangle(size, center, "#777777");
+  
+  //account for max level towers
+  if (tower.level > 2) {
+    drawText('Fully Upgraded', {x: topLeft.x + 10, y: topLeft.y}, menuFont, menuColors.name, 'black', 0);
+    return;
+  }
+  
+  drawText(humanTexts[changingAttribute], {x: topLeft.x + 10, y: topLeft.y}, menuFont, menuColors[changingAttribute], 'black', 0);
+  drawText(upgradeText, {x: topLeft.x + 10, y: topLeft.y + 25}, menuFont, menuColors[changingAttribute], 'black', 0);
+
+  const buttonTopLeft = {x: upgradeButton.center.x - upgradeButton.size.x / 2, y: upgradeButton.center.y - upgradeButton.size.y / 2};
+  drawRectangle(upgradeButton.size, upgradeButton.center, "#aaaaaa");
+  drawText(upgradeButton.text, {x: buttonTopLeft.x + 5, y: buttonTopLeft.y - 5}, menuFont, menuColors.price, 'black', 0);
+}
+
+const drawSelectedTowerMenu = (tower, selectedTowerMenu) => {
+  if (tower.chosenUpgradePath !== null) { // only show the menu for the upgrade path taken
+    drawUpgradeMenu(tower.chosenUpgradePath, selectedTowerMenu, tower);
+  } else { // tower has never been upgraded, show all upgrade menus
+    drawUpgradeMenu(0, selectedTowerMenu, tower);
+    drawUpgradeMenu(1, selectedTowerMenu, tower);
+    drawUpgradeMenu(2, selectedTowerMenu, tower);
+  }
+  
 }

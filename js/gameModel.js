@@ -24,6 +24,7 @@ const initializeGameModel = () => {
       this.placingTower = null;
       this.explosionParticleSystems = [];
       this.towerMenu = initializeTowerMenu();
+      this.selectedTowerMenu = null;
       this.currentMoney = 1000;
       this.currentLevel = createLevel(1, 'left', 'right', 10, 30);
       this.startLevel = false;
@@ -93,7 +94,6 @@ const initializeGameModel = () => {
         if (this.displayGrid) {drawGrid();}
         drawArena();
         for (let tower of this.activeTowers) {
-            tower.base.center = tower.center;
           renderTexture(tower.base);
           renderTexture(tower);
         }
@@ -102,9 +102,6 @@ const initializeGameModel = () => {
         }
         for (let creep of this.activeCreeps) {
           drawHealthBar(50, 2, {x: creep.center.x, y: creep.center.y - 35}, creep.currentHealth / creep.maxHealth);
-        }
-        if (gameModel.selectedTower) {
-          drawTowerRange(gameModel.selectedTower);
         }
 
         for (let system of this.explosionParticleSystems) {
@@ -119,6 +116,11 @@ const initializeGameModel = () => {
           renderTexture(gameModel.placingTower.base);
           renderTexture(gameModel.placingTower);
           drawTowerRange(gameModel.placingTower);
+        }
+
+        if (gameModel.selectedTower) {
+          drawTowerRange(gameModel.selectedTower);
+          drawSelectedTowerMenu(gameModel.selectedTower, gameModel.selectedTowerMenu);
         }
     },
   }

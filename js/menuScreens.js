@@ -216,6 +216,18 @@ const setupMenuButtons = (game) => {
     );
   }
 
+  let clickedUpgradeMenu = false;
+  const checkForUpgradeClick = (upgradePath, selectedTowerMenu, clickPos) => {
+    const upgradeMenu = selectedTowerMenu.upgradeMenus[upgradePath];
+    if (mouseCollidesWithRect(clickPos, upgradeMenu)) {
+      clickedUpgradeMenu = true;
+      if (upgradeMenu.upgradeButton !== null && mouseCollidesWithRect(clickPos, upgradeMenu.upgradeButton)) {
+        gameModel.selectedTower.upgrade(upgradePath);
+      }
+    }
+    
+  }
+
   // set up mouse listeners
   let mouseCapture = false;
   gameModel.keyboard.register('mousedown', function(e, elapsedTime) {
@@ -226,27 +238,37 @@ const setupMenuButtons = (game) => {
       gameModel.placingTower = {...hoveredSprite, base: {...hoveredSprite.base}};
 
     }
-  });
-  gameModel.keyboard.register('mouseup', function(e, elapsedTime) {
     // logic for showing tower range and menu on click
     const clickPos = {
       x : (e.clientX - canvas.offsetLeft) * canvas.width / canvas.clientWidth,
       y : (e.clientY - canvas.offsetTop) * canvas.height / canvas.clientHeight
     };
-    if (gameModel.activeTowers) {
-      gameModel.selectedTower = null;
-      for (let tower of gameModel.activeTowers) {
-        // circle mouse collision
-        const xDistSquared = Math.pow(clickPos.x - tower.center.x, 2);
-        const yDistSquared = Math.pow(clickPos.y - tower.center.y, 2);
-        const dist = Math.sqrt(xDistSquared + yDistSquared);
-        if (dist <= tower.size.x / 2) {
-          gameModel.selectedTower = tower;
-          break;
-        }
+    clickedUpgradeMenu = false;
+    if (gameModel.selectedTower) {
+      if (gameModel.selectedTower.chosenUpgradePath === null) {
+        checkForUpgradeClick(0, gameModel.selectedTowerMenu, clickPos)
+        checkForUpgradeClick(1, gameModel.selectedTowerMenu, clickPos)
+        checkForUpgradeClick(2, gameModel.selectedTowerMenu, clickPos)
+      } else {
+        checkForUpgradeClick(gameModel.selectedTower.chosenUpgradePath, gameModel.selectedTowerMenu, clickPos)
       }
     }
-
+    if (!clickedUpgradeMenu) {
+      gameModel.selectedTower = null;
+    }
+    for (let tower of gameModel.activeTowers) {
+      // circle mouse collision
+      const xDistSquared = Math.pow(clickPos.x - tower.center.x, 2);
+      const yDistSquared = Math.pow(clickPos.y - tower.center.y, 2);
+      const dist = Math.sqrt(xDistSquared + yDistSquared);
+      if (dist <= tower.size.x / 2) {
+        gameModel.selectedTower = tower;
+        gameModel.selectedTowerMenu = initializeSelectedTowerMenu(tower);
+        break;
+      }
+    }
+  });
+  gameModel.keyboard.register('mouseup', function(e, elapsedTime) {
     if (gameModel.placingTower) {
       attemptToPlace(gameModel.placingTower);
       gameModel.placingTower = null;
@@ -280,8 +302,15 @@ const setupMenuButtons = (game) => {
 
     // logic for placing a new tower goes in here
     if (gameModel.placingTower) {
-      gameModel.placingTower.base.center = mousePos;
-      gameModel.placingTower.center = mousePos;
+      let gridPos = convertCanvasLocationToGridPos(mousePos);
+      let snappedPos = {};
+      if (gridPos.row == -1) {
+        snappedPos = {x: -1000, y: -1000}; // off screen
+      } else {
+        snappedPos = convertGridPosToCanvasLocation(gridPos);
+      }
+      gameModel.placingTower.base.center = snappedPos;
+      gameModel.placingTower.center = snappedPos;
     }
   });
 };
