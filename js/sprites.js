@@ -65,6 +65,16 @@ function updateCreepAngle(creep) {
   }
 }
 
+function updateCreepPaths() {
+  for (let i = 0; i < gameModel.activeCreeps.length; i++) {
+    let creep = gameModel.activeCreeps[i];
+    console.log(creep.path);
+    creep.path = getShortestPath(creep.path[creep.path.length-1], creep.path[1]);
+    if (creep.path.constructor === Array) {
+      creep.path.unshift('end');
+    }
+  }
+}
 
 
 function updateCreepPos(creep) {

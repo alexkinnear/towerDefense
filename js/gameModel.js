@@ -69,8 +69,6 @@ const initializeGameModel = () => {
     startNextLevel() {
         // TODO: Implement this
         this.levelInfo = createLevel(1, 'left', 'top', 10, 0, 30);
-        console.log(this.levelInfo);
-        console.log(convertCanvasLocationToGridPos({x: 340, y: 125}));
     },
 
     update(elapsedTime) {
@@ -95,6 +93,7 @@ const initializeGameModel = () => {
         if (this.displayGrid) {drawGrid();}
         drawArena();
         for (let tower of this.activeTowers) {
+            tower.base.center = tower.center;
           renderTexture(tower.base);
           renderTexture(tower);
         }

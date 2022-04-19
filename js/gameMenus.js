@@ -21,12 +21,21 @@ const isInGrid = (tower) => {
 
 const doesntBlockPath = (tower) => {
   // TODO: make sure tower doesn't block paths between any 2 exits
+  // Check left to right
   return true;
 }
 
 const attemptToPlace = (tower) => {
   if (gameModel.currentMoney >= tower.price && isInGrid(tower) && doesntBlockPath(tower)) {
-    gameModel.activeTowers.push(gameModel.placingTower);
-    gameModel.currentMoney -= tower.price;
+    let gridPos = convertCanvasLocationToGridPos(gameModel.placingTower.center);
+    if (gameModel.grid[gridPos.row][gridPos.col].length === 0) {
+      gameModel.placingTower.center = convertGridPosToCanvasLocation(gridPos);
+      gameModel.grid[gridPos.row][gridPos.col].push(gameModel.placingTower);
+      gameModel.activeTowers.push(gameModel.placingTower);
+      gameModel.currentMoney -= tower.price;
+
+      // updateCreepPaths having some issues
+      // updateCreepPaths();
+    }
   }
 }
