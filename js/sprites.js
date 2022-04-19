@@ -1,4 +1,72 @@
 
+//------------------------------------------------------------------
+//
+// Returns the magnitude of the 2D cross product.  The sign of the
+// magnitude tells you which direction to rotate to close the angle
+// between the two vectors.
+//
+//------------------------------------------------------------------
+function crossProduct2d(v1, v2) {
+  return (v1.x * v2.y) - (v1.y * v2.x);
+}
+
+//------------------------------------------------------------------
+//
+// Computes the angle, and direction (cross product) between two vectors.
+//
+//------------------------------------------------------------------
+function computeAngle(rotation, ptCenter, ptTarget) {
+  let v1 = {
+    x : Math.cos(rotation),
+    y : Math.sin(rotation)
+  };
+  let v2 = {
+    x : ptTarget.x - ptCenter.x,
+    y : ptTarget.y - ptCenter.y
+  };
+
+  v2.len = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+  v2.x /= v2.len;
+  v2.y /= v2.len;
+
+  let dp = v1.x * v2.x + v1.y * v2.y;
+  let angle = Math.acos(dp);
+
+  //
+  // Get the cross product of the two vectors so we can know
+  // which direction to rotate.
+  let cp = crossProduct2d(v1, v2);
+
+  return {
+    angle : angle,
+    crossProduct : cp
+  };
+}
+
+//------------------------------------------------------------------
+//
+// Simple helper function to help testing a value with some level of tolerance.
+//
+//------------------------------------------------------------------
+function testTolerance(value, test, tolerance) {
+  return Math.abs(value - test) < tolerance;
+}
+
+function updateCreepAngle(creep) {
+  if (creep.nextPos !== null) {
+    let angleInfo = computeAngle(creep.rotation, creep.center, creep.nextPos);
+    let tolerance = 0.05;
+    if (angleInfo.crossProduct < 0 && angleInfo.angle > tolerance) {   // rotate left
+      creep.rotation -= creep.rotateRate;
+    }
+    else if (angleInfo.crossProduct > 0 && angleInfo.angle > tolerance) {  // rotate right
+      creep.rotation += creep.rotateRate;
+    }
+  }
+}
+
+
+
 function updateCreepPos(creep) {
   if (creep.nextPos === null && creep.elapsedTime / 1000 >= creep.enterTime) {
     getNextPos(creep);
@@ -57,6 +125,7 @@ const creep = (pos, assetName, maxHealth) => {
     size: {x: 40, y: 40},
     speed: 0.5,
     rotation: 0,
+    rotateRate: Math.PI / 180,
     maxHealth: maxHealth,
     currentHealth: maxHealth,
     animationIndex: 1,
@@ -73,6 +142,7 @@ const creep = (pos, assetName, maxHealth) => {
       this.elapsedTime += elapsedTime;
       updateCreepPos(this);
       updateCreepGridPos(this);
+      updateCreepAngle(this);
 
       if (typeof this.canvasEnd !== 'undefined') {
         if (Math.abs(this.center.x - this.canvasEnd.x) < 0.5 && Math.abs(this.center.y - this.canvasEnd.y) < 0.5) {
