@@ -23,12 +23,37 @@ function updateCreepPos(creep) {
   }
 }
 
+function updateCreepGridPos(creep) {
+  let oldPos = creep.gridPos;
+  let newPos = convertCanvasLocationToGridPos(creep.center);
+  if (oldPos.row === newPos.row && oldPos.col === newPos.col) {
+    return;
+  }
+  if (newPos.row === -1 && oldPos.row !== -1) {
+    if (gameModel.grid[oldPos.row][oldPos.col].includes(creep)) {
+      let idx = gameModel.grid[oldPos.row][oldPos.col].findIndex(c => c.id === creep.id);
+      gameModel.grid[oldPos.row][oldPos.col].splice(idx, 1);
+    }
+  }
+  else if (newPos.row !== -1 && oldPos.row === -1) {
+    creep.gridPos = newPos;
+    gameModel.grid[newPos.row][newPos.col].push(creep);
+  }
+  else {
+    let idx = gameModel.grid[oldPos.row][oldPos.col].findIndex(c => c.id === creep.id);
+    gameModel.grid[oldPos.row][oldPos.col].splice(idx, 1);
+    creep.gridPos = newPos;
+    gameModel.grid[newPos.row][newPos.col].push(creep);
+  }
+}
+
 const creep = (pos, assetName, maxHealth) => {
   const frameTime = 125; // in ms
   gameModel.creepId++;
   return {
     id: gameModel.creepId,
     center: pos,
+    gridPos: convertCanvasLocationToGridPos(this.center),
     size: {x: 40, y: 40},
     speed: 0.5,
     rotation: 0,
@@ -47,6 +72,7 @@ const creep = (pos, assetName, maxHealth) => {
       this.timeLeftOnCurrFrame -= elapsedTime;
       this.elapsedTime += elapsedTime;
       updateCreepPos(this);
+      updateCreepGridPos(this);
 
       if (typeof this.canvasEnd !== 'undefined') {
         if (Math.abs(this.center.x - this.canvasEnd.x) < 0.5 && Math.abs(this.center.y - this.canvasEnd.y) < 0.5) {

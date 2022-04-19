@@ -70,6 +70,7 @@ const initializeGameModel = () => {
         // TODO: Implement this
         this.levelInfo = createLevel(1, 'left', 'bottom', 10, 0, 30);
         console.log(this.levelInfo);
+        console.log(convertCanvasLocationToGridPos({x: 340, y: 125}));
     },
 
     update(elapsedTime) {

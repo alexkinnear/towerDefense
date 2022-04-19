@@ -4,7 +4,7 @@ function initializeGrid(rows, cols) {
     for (let i = 0; i < rows; i++) {
         grid.push([]);
         for (let j = 0; j < cols; j++) {
-            grid[i].push(' ');
+            grid[i].push([]);
         }
     }
     return grid;
@@ -15,7 +15,7 @@ function isOpenSpace(row, col) {
     if (row < 0 || col < 0 || row >= gameModel.grid.length || col >= gameModel.grid[row].length) {
         return false;
     }
-    return gameModel.grid[row][col] === ' ';
+    return gameModel.grid[row][col].length === 0;
 }
 
 // Gets the distance between current pos and end without consideration for obstacles

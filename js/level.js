@@ -36,6 +36,16 @@ function convertGridPosToCanvasLocation(gridPos) {
     return {x: x, y: y}
 }
 
+function convertCanvasLocationToGridPos(canvasLoc) {
+    if (typeof canvasLoc === 'undefined') return {row: -1, col: -1};
+    let cellSize = (canvas.width - (gameModel.GRID_OFFSET * 2)) / gameModel.GRID_SIZE;
+    let col = Math.floor((canvasLoc.x - gameModel.GRID_OFFSET) / cellSize);
+    let row = Math.floor((canvasLoc.y - gameModel.GRID_OFFSET) / cellSize);
+    if (row < 0 || col < 0 || row >= gameModel.GRID_SIZE || col >= gameModel.GRID_SIZE) {return {row: -1, col: -1}}
+    return {row: row, col: col};
+}
+
+
 function getNextPos(creep) {
     if (creep.path.length > 0) {
         let loc = creep.path.pop();
