@@ -67,15 +67,16 @@ function updateCreepAngle(creep) {
 
 function updateCreepPaths() {
   for (let i = 0; i < gameModel.activeCreeps.length; i++) {
-    let creep = gameModel.activeCreeps[i];
-    if (creep.gridPos.row === -1) {
-      creep.path = getShortestPath(gameModel.currentLevel.entrance, gameModel.currentLevel.exit);
+    if (gameModel.activeCreeps[i].type === 'ground') {
+      let creep = gameModel.activeCreeps[i];
+      if (creep.gridPos.row === -1) {
+        creep.path = getShortestPath(gameModel.currentLevel.entrance, gameModel.currentLevel.exit);
+      }
+      else {
+        creep.path = getShortestPath(creep.gridPos, gameModel.currentLevel.exit);
+      }
+      creep.path.unshift('end');
     }
-    else {
-      creep.path = getShortestPath(creep.gridPos, gameModel.currentLevel.exit);
-      console.log(creep.path);
-    }
-    creep.path.unshift('end');
   }
 }
 
@@ -127,11 +128,46 @@ function updateCreepGridPos(creep) {
   }
 }
 
+function distance(pt1, pt2) {
+  return Math.abs(Math.sqrt(Math.pow(pt1.x - pt2.x, 2) + Math.pow(pt1.y - pt2.y, 2)));
+}
+
+function findClosestCreep(tower) {
+  let d = Math.pow(10, 1000) // Max positive number
+  let idx = null;
+  for (let i = 0; i < gameModel.activeCreeps.length; i++) {
+    let dis = distance(tower.center, gameModel.activeCreeps[i].center)
+    if (dis < d) {
+      d = dis;
+      idx = i;
+    }
+  }
+  return idx !== null ? gameModel.activeCreeps[idx] : null;
+}
+
+function updateTowerAngle(tower) {
+  let creep = findClosestCreep(tower);
+  if (creep !== null) {
+    let angleInfo = computeAngle(tower.rotation, tower.center, creep.center);
+    let tolerance = 0.05;
+    let dis = distance(tower.center, creep.center);
+    if (dis <= tower.groundRange) {
+      if (angleInfo.crossProduct < 0 && angleInfo.angle > tolerance) {   // rotate left
+        tower.rotation -= tower.rotateRate;
+      }
+      else if (angleInfo.crossProduct > 0 && angleInfo.angle > tolerance) {  // rotate right
+        tower.rotation += tower.rotateRate;
+      }
+    }
+  }
+}
+
 const creep = (pos, assetName, maxHealth) => {
   const frameTime = 125; // in ms
   gameModel.creepId++;
   return {
     id: gameModel.creepId,
+    type: assetName.slice(6, 7) < '3' ? 'ground' : 'air',
     center: pos,
     gridPos: convertCanvasLocationToGridPos(this.center),
     size: {x: 40, y: 40},
@@ -151,7 +187,6 @@ const creep = (pos, assetName, maxHealth) => {
     assetName,
     update(elapsedTime) {
       this.timeLeftOnCurrFrame -= elapsedTime;
-      // console.log(gameModel.startLevel);
       if (gameModel.startLevel) {
         this.elapsedTime += elapsedTime;
         updateCreepPos(this);
@@ -194,7 +229,7 @@ const tower = (pos,
     center: pos,
     size: {x: 50, y: 50},
     rotation: 0,
-    rotationSpeed: 100, // not sure what this should be yet
+    rotateRate: Math.PI / 45,
     airRange,
     groundRange,
     price,
@@ -210,10 +245,12 @@ const tower = (pos,
     base: towerBase(pos),
     update(elapsedTime) {
       // point the tower at the right creep
+      updateTowerAngle(this);
     },
     upgrade(upgradePath) {
       const nextUpgrade = this.upgradePaths[upgradePath][this.level - 1]
       const changingAttribute = Object.keys(nextUpgrade)[0];
+
 
       if (gameModel.currentMoney >= this.price) {
         gameModel.currentMoney -= nextUpgrade.price;

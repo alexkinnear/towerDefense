@@ -79,6 +79,11 @@ const initializeGameModel = () => {
         for (let creep of this.activeCreeps) {
             creep.update(elapsedTime);
         }
+
+        for (let tower of this.activeTowers) {
+            tower.update(elapsedTime);
+        }
+
         for (let i = 0; i < this.explosionParticleSystems.length; i++) {
           const system = this.explosionParticleSystems[i];
           system.update(elapsedTime);
@@ -87,6 +92,7 @@ const initializeGameModel = () => {
             i--; // modified the array mid-loop, so decrement the counter
           }
         }
+
     },
 
     render() {
