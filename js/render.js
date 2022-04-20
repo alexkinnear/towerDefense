@@ -61,6 +61,19 @@ const drawRectangle = (size, center, color) => {
   context.restore();
 }
 
+const drawCircle = (radius, center, color) => {
+  context.save();
+  context.fillStyle = color; // Bullet color
+  context.lineWidth = 2;
+  context.strokeStyle = '#000000'; // black outline
+  context.beginPath();
+  context.arc(center.x, center.y, radius, 0, 2 * Math.PI, false);
+  context.fill();
+  context.closePath();
+  context.restore();
+
+}
+
 const drawTowerRange = (tower) => {  
   if (tower.groundRange) {
     context.save();

@@ -136,6 +136,13 @@ function findClosestCreep(tower) {
   let d = Math.pow(10, 1000) // Max positive number
   let idx = null;
   for (let i = 0; i < gameModel.activeCreeps.length; i++) {
+    // Prevent ground tower from locking onto air target
+    if (tower.airRange === null && gameModel.activeCreeps[i].type === 'air') {
+      continue;
+    }
+    else if (tower.groundRange === null && gameModel.activeCreeps[i].type === 'ground') {
+      continue;
+    }
     let dis = distance(tower.center, gameModel.activeCreeps[i].center)
     if (dis < d) {
       d = dis;
@@ -148,17 +155,49 @@ function findClosestCreep(tower) {
 function updateTowerAngle(tower) {
   let creep = findClosestCreep(tower);
   if (creep !== null) {
-    let angleInfo = computeAngle(tower.rotation, tower.center, creep.center);
+    let angleInfo = computeAngle(tower.rotation - Math.PI / 2, tower.center, creep.center);
     let tolerance = 0.05;
     let dis = distance(tower.center, creep.center);
-    if (dis <= tower.groundRange) {
-      if (angleInfo.crossProduct < 0 && angleInfo.angle > tolerance) {   // rotate left
-        tower.rotation -= tower.rotateRate;
-      }
-      else if (angleInfo.crossProduct > 0 && angleInfo.angle > tolerance) {  // rotate right
-        tower.rotation += tower.rotateRate;
+    if (creep.type === 'ground') {
+      if (dis <= tower.groundRange) {
+        if (angleInfo.crossProduct < 0 && angleInfo.angle > tolerance) {   // rotate left
+          tower.rotation -= tower.rotateRate;
+        }
+        else if (angleInfo.crossProduct > 0 && angleInfo.angle > tolerance) {  // rotate right
+          tower.rotation += tower.rotateRate;
+        }
+        else {
+          // Add bullets at increment of fire rate
+          if (tower.elapsedTime - tower.lastBulletTimeStamp >= tower.fireRate && tower.name !== 'bomber') {
+            let center = {x: tower.center.x, y: tower.center.y};
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, false));
+            gameModel.bulletId++;
+            tower.lastBulletTimeStamp = tower.elapsedTime;
+          }
+        }
       }
     }
+    else {  // air creep
+      if (dis <= tower.airRange) {
+        if (angleInfo.crossProduct < 0 && angleInfo.angle > tolerance) {   // rotate left
+          tower.rotation -= tower.rotateRate;
+        }
+        else if (angleInfo.crossProduct > 0 && angleInfo.angle > tolerance) {  // rotate right
+          tower.rotation += tower.rotateRate;
+        }
+        else {
+          // Add bullets at increment of fire rate
+          if (tower.elapsedTime - tower.lastBulletTimeStamp >= tower.fireRate && tower.name !== 'bomber') {
+            let center = {x: tower.center.x, y: tower.center.y};
+            let guided = tower.name === 'Air Seeker';
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided));
+            gameModel.bulletId++;
+            tower.lastBulletTimeStamp = tower.elapsedTime;
+          }
+        }
+      }
+    }
+
   }
 }
 
@@ -230,6 +269,8 @@ const tower = (pos,
     size: {x: 50, y: 50},
     rotation: 0,
     rotateRate: Math.PI / 45,
+    elapsedTime: 0,
+    lastBulletTimeStamp: 0,
     airRange,
     groundRange,
     price,
@@ -244,7 +285,8 @@ const tower = (pos,
     assetName: sprites[0],
     base: towerBase(pos),
     update(elapsedTime) {
-      // point the tower at the right creep
+      this.elapsedTime += elapsedTime / 1000; // Track elapsed time in seconds
+      // point the tower at the closest creep
       updateTowerAngle(this);
     },
     upgrade(upgradePath) {
@@ -344,5 +386,90 @@ const airSeeker = (pos) => {
 
 const heatSeeker = (pos) => {
   return tower(pos, heatSeekerSpec);
+}
+
+function getDirection(pt1, pt2, velocity) {
+  let dx = pt2.x - pt1.x !== 0 ? pt2.x - pt1.x : 0.01;
+  let dy = pt2.y - pt1.y !== 0 ? pt2.y - pt1.y : 0.01;
+  let slope = dy / dx;
+  let yRate = 0;
+  let xRate = 0;
+  if (-1 < slope < 1) { // dx is bigger
+    xRate = dx > 0 ? velocity : -velocity;
+    yRate = dy > 0 ? Math.abs(velocity * slope) : -Math.abs(velocity * slope);
+  }
+  else {  // dy is bigger
+    xRate = dx > 0 ? velocity / Math.abs(slope) : -Math.abs(velocity / slope);
+    yRate = dy > 0 ? velocity : -velocity;
+  }
+  return {dx: xRate, dy: yRate};
+}
+
+function updateBulletPos(bullet) {
+  // Move bullet toward creep and remove from gameModel.activeBullets on impact
+  let diffx = Math.abs(bullet.center.x - bullet.target.center.x);
+  let diffy = Math.abs(bullet.center.y - bullet.target.center.y);
+
+  let xRate = 0;
+  let yRate = 0;
+  let slope = diffx / diffy;
+  if (slope > 1) {
+    xRate = bullet.speed;
+    yRate = bullet.speed / slope;
+  }
+  else {
+    yRate = bullet.speed;
+    xRate = bullet.speed / diffy / diffx;
+  }
+
+  let dx = 0;
+  let dy = 0;
+
+  if (bullet.center.x < bullet.target.center.x) {
+    bullet.center.x += xRate;
+  }
+  if (bullet.center.x > bullet.target.center.x) {
+    bullet.center.x -= xRate;
+  }
+  if (bullet.center.y < bullet.target.center.y) {
+    bullet.center.y += yRate;
+  }
+  else if (bullet.center.y > bullet.target.center.y) {
+    bullet.center.y -= yRate;
+  }
+}
+
+function outOfBounds(obj) {
+  return (obj.x < gameModel.GRID_OFFSET || obj.y < gameModel.GRID_OFFSET || obj.x > canvas.width - gameModel.GRID_OFFSET || obj.y > canvas.height - gameModel.GRID_OFFSET);
+}
+
+
+
+const bullet = (id, pos, radius, color, target, guided) => {
+  return {
+    id: id,
+    center: pos,
+    radius: radius,
+    color: color,
+    speed: 3,
+    target: guided ? target : JSON.parse(JSON.stringify(target)),
+    guided: guided,
+    direction: getDirection(pos, target.center, 3),
+    update(elapsedTime) {
+      if (this.guided) {
+        updateBulletPos(this);
+      }
+      else {
+        this.center.x += this.direction.dx;
+        this.center.y += this.direction.dy;
+      }
+
+      // Not removing bullets properly
+      if (outOfBounds(this.center)) {
+        let idx = gameModel.activeBullets.findIndex(b => b.id === this.id);
+        gameModel.activeBullets.splice(idx, 1);
+      }
+    }
+  }
 }
 

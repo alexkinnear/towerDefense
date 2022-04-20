@@ -21,6 +21,8 @@ const initializeGameModel = () => {
       this.creepId = 0;
       this.activeCreeps = [];
       this.activeTowers = [];
+      this.activeBullets = [];
+      this.bulletId = 0;
       this.placingTower = null;
       this.explosionParticleSystems = [];
       this.towerMenu = initializeTowerMenu();
@@ -84,6 +86,10 @@ const initializeGameModel = () => {
             tower.update(elapsedTime);
         }
 
+        for (let bullet of this.activeBullets) {
+            bullet.update(elapsedTime);
+        }
+
         for (let i = 0; i < this.explosionParticleSystems.length; i++) {
           const system = this.explosionParticleSystems[i];
           system.update(elapsedTime);
@@ -108,6 +114,10 @@ const initializeGameModel = () => {
         }
         for (let creep of this.activeCreeps) {
           drawHealthBar(50, 2, {x: creep.center.x, y: creep.center.y - 35}, creep.currentHealth / creep.maxHealth);
+        }
+
+        for (let bullet of this.activeBullets) {
+            drawCircle(bullet.radius, bullet.center, bullet.color);
         }
 
         for (let system of this.explosionParticleSystems) {
