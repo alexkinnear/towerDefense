@@ -1,3 +1,23 @@
+function collision(bullet, creep) {
+  if (creep.type === 'air' && bullet.type === 'ground') return false;
+  else if (creep.type === 'ground' && bullet.type === 'air') return false;
+
+  let leftX1 = bullet.center.x - bullet.radius;
+  let leftX2 = creep.center.x - creep.size.x / 2;
+  let rightX1 = bullet.center.x + bullet.radius;
+  let rightX2 = creep.center.x + creep.size.x / 2;
+  let xOverlap = (rightX1 >= leftX2 && rightX1 <= rightX2) || (rightX2 >= leftX1 && rightX2 <= rightX1);
+
+  let topY1 = bullet.center.y - bullet.radius;
+  let topY2 = creep.center.y - creep.size.y / 2;
+  let bottomY1 = bullet.center.y + bullet.radius;
+  let bottomY2 = creep.center.y + creep.size.y / 2;
+  let yOverlap = (bottomY1 >= topY2 && bottomY1 <= bottomY2) || (bottomY2 >= topY1 && bottomY2 <= bottomY1);
+
+  return xOverlap && yOverlap;
+}
+
+
 
 //------------------------------------------------------------------
 //
@@ -155,6 +175,12 @@ function findClosestCreep(tower) {
 function updateTowerAngle(tower) {
   let creep = findClosestCreep(tower);
   if (creep !== null) {
+
+    let type = null;
+    if (tower.name === 'Air Seeker') type = 'air';
+    else if (tower.name === 'Heat Seeker') type = 'hybrid';
+    else type = 'ground';
+
     let angleInfo = computeAngle(tower.rotation - Math.PI / 2, tower.center, creep.center);
     let tolerance = 0.05;
     let dis = distance(tower.center, creep.center);
@@ -170,7 +196,8 @@ function updateTowerAngle(tower) {
           // Add bullets at increment of fire rate
           if (tower.elapsedTime - tower.lastBulletTimeStamp >= tower.fireRate && tower.name !== 'bomber') {
             let center = {x: tower.center.x, y: tower.center.y};
-            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, false));
+            let damage = tower.damage;
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, false, damage, type));
             gameModel.bulletId++;
             tower.lastBulletTimeStamp = tower.elapsedTime;
           }
@@ -190,7 +217,8 @@ function updateTowerAngle(tower) {
           if (tower.elapsedTime - tower.lastBulletTimeStamp >= tower.fireRate && tower.name !== 'bomber') {
             let center = {x: tower.center.x, y: tower.center.y};
             let guided = tower.name === 'Air Seeker';
-            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided));
+            let damage = tower.damage;
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type));
             gameModel.bulletId++;
             tower.lastBulletTimeStamp = tower.elapsedTime;
           }
@@ -231,6 +259,11 @@ const creep = (pos, assetName, maxHealth) => {
         updateCreepPos(this);
         updateCreepGridPos(this);
         updateCreepAngle(this);
+      }
+
+      if (this.currentHealth <= 0) {
+        let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
+        gameModel.activeCreeps.splice(idx, 1);
       }
 
       if (typeof this.canvasEnd !== 'undefined') {
@@ -407,6 +440,9 @@ function getDirection(pt1, pt2, velocity) {
 
 function updateBulletPos(bullet) {
   // Move bullet toward creep and remove from gameModel.activeBullets on impact
+  // let direction = getDirection(bullet.center, bullet.target.center, bullet.speed);
+  // bullet.center.x += direction.dx;
+  // bullet.center.y += direction.dy;
   let diffx = Math.abs(bullet.center.x - bullet.target.center.x);
   let diffy = Math.abs(bullet.center.y - bullet.target.center.y);
 
@@ -443,15 +479,25 @@ function outOfBounds(obj) {
   return (obj.x < gameModel.GRID_OFFSET || obj.y < gameModel.GRID_OFFSET || obj.x > canvas.width - gameModel.GRID_OFFSET || obj.y > canvas.height - gameModel.GRID_OFFSET);
 }
 
+function checkCollision(bullet) {
+  for (let i = 0; i < gameModel.activeCreeps.length; i++) {
+    if (collision(bullet, gameModel.activeCreeps[i])) {
+      let idx = gameModel.activeBullets.findIndex(b => b.id === bullet.id);
+      gameModel.activeBullets.splice(idx, 1);
+      gameModel.activeCreeps[i].currentHealth -= bullet.damage;
+    }
+  }
+}
 
-
-const bullet = (id, pos, radius, color, target, guided) => {
+const bullet = (id, pos, radius, color, target, guided, damage, type) => {
   return {
     id: id,
     center: pos,
     radius: radius,
     color: color,
     speed: 3,
+    damage: damage,
+    type: type,
     target: guided ? target : JSON.parse(JSON.stringify(target)),
     guided: guided,
     direction: getDirection(pos, target.center, 3),
@@ -463,6 +509,8 @@ const bullet = (id, pos, radius, color, target, guided) => {
         this.center.x += this.direction.dx;
         this.center.y += this.direction.dy;
       }
+
+      checkCollision(this);
 
       // Not removing bullets properly
       if (outOfBounds(this.center)) {
