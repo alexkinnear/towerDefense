@@ -89,13 +89,24 @@ function createLevel(id, entrance, exit, howManyCreeps, duration, numWaves) {
     canvasPos['top'] = {x: canvas.width / 2, y: 0};
     canvasPos['bottom'] = {x: canvas.width / 2, y: canvas.height};
 
+    let waves = [];
+    for (let i = 0; i < numWaves; i++) {
+        let bounds = {};
+        bounds['min'] = duration/numWaves*i;
+        bounds['max'] = duration/numWaves*i + duration / numWaves / 2;
+        waves.push(bounds);
+    }
+    console.log(waves);
+
     // fill out the creeps list with the level's creeps
     gameModel.activeCreeps = createCreeps(howManyCreeps);
     let path = getShortestPath(gridPos[entrance], gridPos[exit]);
     for (let i = 0; i < gameModel.activeCreeps.length; i++) {
         // Randomly generate the time the creeps enter the arena
-        gameModel.activeCreeps[i].enterTime = duration * Random.nextDouble();
-        gameModel.activeCreeps[i].enterTime = duration * Random.nextDouble();
+        let whichWave = waves[Math.floor(Math.random() * waves.length)];
+        console.log(whichWave.max, whichWave.min);
+        gameModel.activeCreeps[i].enterTime = Math.random() * (whichWave.max - whichWave.min) + whichWave.min;
+        console.log(gameModel.activeCreeps[i].enterTime);
         gameModel.activeCreeps[i].path = JSON.parse(JSON.stringify(path)); // Deep copy
         gameModel.activeCreeps[i].path.unshift('end');
         gameModel.activeCreeps[i].canvasEnd = canvasPos[exit];
