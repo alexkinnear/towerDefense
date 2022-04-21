@@ -201,7 +201,7 @@ function updateTowerAngle(tower) {
         }
         else {
           // Add bullets at increment of fire rate
-          if (tower.elapsedTime - tower.lastBulletTimeStamp >= tower.fireRate && tower.name !== 'bomber') {
+          if (tower.elapsedTime - tower.lastBulletTimeStamp >= 1 / tower.fireRate && tower.name !== 'bomber') {
             let center = {x: tower.center.x, y: tower.center.y};
             let damage = tower.damage;
             gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, color, creep, false, damage, type, bomb));
@@ -221,7 +221,7 @@ function updateTowerAngle(tower) {
         }
         else {
           // Add bullets at increment of fire rate
-          if (tower.elapsedTime - tower.lastBulletTimeStamp >= tower.fireRate && tower.name !== 'bomber') {
+          if (tower.elapsedTime - tower.lastBulletTimeStamp >= 1 / tower.fireRate && tower.name !== 'bomber') {
             let center = {x: tower.center.x, y: tower.center.y};
             let guided = tower.name === 'Air Seeker';
             let damage = tower.damage;
@@ -250,6 +250,7 @@ const creep = (pos, assetName, maxHealth) => {
     rotateRate: Math.PI / 180,
     maxHealth: maxHealth,
     currentHealth: maxHealth,
+    killValue: Math.round(maxHealth / 4),
     animationIndex: 1,
     nextPos: null,
     elapsedTime: 0,
@@ -270,7 +271,10 @@ const creep = (pos, assetName, maxHealth) => {
 
       if (this.currentHealth <= 0) {
         let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
+        gameModel.currentMoney += this.killValue;
         gameModel.activeCreeps.splice(idx, 1);
+        gameModel.score += this.maxHealth;
+        gameModel.scoreIndicators.push(scoreIndicator({x: this.center.x - this.size.x / 3, y: this.center.y - this.size.y / 2}, `+${this.maxHealth}`));
         gameModel.explosionParticleSystems.push(
           ParticleSystem({
             center: this.center,
@@ -337,15 +341,18 @@ const tower = (pos,
     update(elapsedTime) {
       this.elapsedTime += elapsedTime / 1000; // Track elapsed time in seconds
       // point the tower at the closest creep
-      updateTowerAngle(this);
+      if (gameModel.startLevel) {
+        updateTowerAngle(this);
+      }
     },
     upgrade(upgradePath) {
       const nextUpgrade = this.upgradePaths[upgradePath][this.level - 1]
       const changingAttribute = Object.keys(nextUpgrade)[0];
 
 
-      if (gameModel.currentMoney >= this.price) {
+      if (gameModel.currentMoney >= nextUpgrade.price) {
         gameModel.currentMoney -= nextUpgrade.price;
+        this.price += nextUpgrade.price;
         this.level += 1;
         this.assetName = this.sprites[this.level - 1];
         this[changingAttribute] = nextUpgrade[changingAttribute];
@@ -357,6 +364,23 @@ const tower = (pos,
     }
   }
 };
+
+const scoreIndicator = (pos, text) => {
+  return {
+    center: pos,
+    text,
+    speed: 0.05,
+    lifeTime: 1000,
+    update(elapsedTime) {
+      this.center.y -= this.speed * elapsedTime;
+      this.lifeTime -= elapsedTime;
+      if (this.lifeTime <= 0) {
+        const idx = gameModel.scoreIndicators.indexOf(this);
+        gameModel.scoreIndicators.splice(idx, 1);
+      }
+    }
+  }
+}
 
 // Some configuration constants to make it easier to tweak the game balance
 // The upgrade paths are lists of objects showing which attribute changes for that upgrade, and the price of the upgrade

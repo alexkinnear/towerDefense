@@ -188,6 +188,13 @@ const drawUpgradeMenu = (upgradePath, selectedTowerMenu, tower) => {
   drawText(upgradeButton.text, {x: buttonTopLeft.x + 5, y: buttonTopLeft.y - 5}, menuFont, menuColors.price, 'black', 0);
 }
 
+const drawSellButton = ({sellButton}) => {
+  const {center, size, text} = sellButton;
+  const buttonTopLeft = {x: center.x - size.x / 2, y: center.y - size.y / 2};
+  drawRectangle(size, center, "#aaaaaa");
+  drawText(text, {x: buttonTopLeft.x + 5, y: buttonTopLeft.y - 5}, menuFont, menuColors.price, 'black', 0);
+}
+
 const drawSelectedTowerMenu = (tower, selectedTowerMenu) => {
   if (tower.chosenUpgradePath !== null) { // only show the menu for the upgrade path taken
     drawUpgradeMenu(tower.chosenUpgradePath, selectedTowerMenu, tower);
@@ -196,11 +203,19 @@ const drawSelectedTowerMenu = (tower, selectedTowerMenu) => {
     drawUpgradeMenu(1, selectedTowerMenu, tower);
     drawUpgradeMenu(2, selectedTowerMenu, tower);
   }
-  
+  drawSellButton(selectedTowerMenu);
 }
 
 function drawLevelInfo() {
-  drawText(`Level ${gameModel.levelNum}`, {x: 10, y: 40}, 'arial', '#FF0000', '#000000', 0);
-  drawText(`Entrance: ${gameModel.currentLevel.entranceString}`, {x: 10, y: 55}, 'arial', '#FF0000', '#000000', 0);
-  drawText(`Exit: ${gameModel.currentLevel.exitString}`, {x: 10, y: 70}, 'arial', '#FF0000', '#000000', 0);
+  drawText(`Level ${gameModel.levelNum}`, {x: 10, y: 70}, 'arial', '#FF0000', '#000000', 0);
+  drawText(`Entrance: ${gameModel.currentLevel.entranceString}`, {x: 10, y: 85}, 'arial', '#FF0000', '#000000', 0);
+  drawText(`Exit: ${gameModel.currentLevel.exitString}`, {x: 10, y: 100}, 'arial', '#FF0000', '#000000', 0);
+}
+
+function drawScoreIndicator(scoreIndicator) {
+  drawText(scoreIndicator.text, scoreIndicator.center, '12px arial', menuColors.effect, 'black', 0);
+}
+
+function drawScore(score) {
+  drawText(score, {x: 10, y: 40}, '24px arial', menuColors.effect, 'black', 0);
 }

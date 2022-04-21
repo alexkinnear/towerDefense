@@ -22,6 +22,7 @@ const initializeGameModel = () => {
       this.activeCreeps = [];
       this.activeTowers = [];
       this.activeBullets = [];
+      this.scoreIndicators = [];
       this.bulletId = 0;
       this.placingTower = null;
       this.explosionParticleSystems = [];
@@ -89,6 +90,10 @@ const initializeGameModel = () => {
 
         for (let bullet of this.activeBullets) {
             bullet.update(elapsedTime);
+        }
+
+        for (let indicator of this.scoreIndicators) {
+          indicator.update(elapsedTime);
         }
 
         for (let i = 0; i < this.explosionParticleSystems.length; i++) {
@@ -167,6 +172,12 @@ const initializeGameModel = () => {
             renderTexture(particle);
           });
         }
+
+        for (let indicator of this.scoreIndicators) {
+          drawScoreIndicator(indicator);
+        }
+
+        drawScore(this.score);
 
         drawTowerMenu(gameModel.towerMenu);
         if (gameModel.placingTower) {

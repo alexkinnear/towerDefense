@@ -225,7 +225,24 @@ const setupMenuButtons = (game) => {
         gameModel.selectedTower.upgrade(upgradePath);
       }
     }
-    
+  }
+
+  const checkForSellButtonClick = (clickPos, {sellButton}) => {
+    if (mouseCollidesWithRect(clickPos, sellButton)) {
+      gameModel.currentMoney += Math.round(gameModel.selectedTower.price * 0.7);
+      const idx = gameModel.activeTowers.indexOf(gameModel.selectedTower);
+      gameModel.explosionParticleSystems.push(
+        ParticleSystem({
+          center: { x: gameModel.selectedTower.center.x, y: gameModel.selectedTower.center.y },
+          size: { mean: 20, stdev: 4 },
+          speed: { mean: 200, stdev: 100 },
+          lifetime: { mean: 0.2, stdev: 0.1 },
+          assetName: 'confettiParticle',
+          duration: 0.1
+        }),
+      );
+      gameModel.activeTowers.splice(idx, 1);
+    }
   }
 
   // set up mouse listeners
@@ -252,6 +269,7 @@ const setupMenuButtons = (game) => {
       } else {
         checkForUpgradeClick(gameModel.selectedTower.chosenUpgradePath, gameModel.selectedTowerMenu, clickPos)
       }
+      checkForSellButtonClick(clickPos, gameModel.selectedTowerMenu);
     }
     if (!clickedUpgradeMenu) {
       gameModel.selectedTower = null;

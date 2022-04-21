@@ -75,6 +75,14 @@ const upgradeMenu = (upgradePath, center, tower) => {
   }
 }
 
+const newSellButton = ({center, price}) => {
+  return {
+    center: {x: center.x, y: center.y + 50},
+    size: {x: 190, y: buttonSize.y},
+    text: `Sell for $${Math.round(price * 0.7)}`,
+  }
+}
+
 const initializeSelectedTowerMenu = (tower) => {
   
   const menu0Center = {x: 247.5, y: 50};
@@ -86,8 +94,11 @@ const initializeSelectedTowerMenu = (tower) => {
     upgradeMenu(2, menu2Center, tower),
   ];
 
+  let sellButton = newSellButton(tower);
+
   let selectedTowerMenu = {
     upgradeMenus,
+    sellButton,
   }
   
   return selectedTowerMenu;
