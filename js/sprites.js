@@ -475,9 +475,6 @@ function updateBulletPos(bullet) {
     xRate = bullet.speed / diffy / diffx;
   }
 
-  let dx = 0;
-  let dy = 0;
-
   if (bullet.center.x < bullet.target.center.x) {
     bullet.center.x += xRate;
   }

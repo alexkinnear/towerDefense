@@ -7,12 +7,17 @@ function createCreeps(howMany) {
     let creeps = [];
     const creepTypes = 3;
     const creepColors = ['blue', 'green', 'red', 'yellow'];
-    const creepHealth = 20;
+    const creepHealth = {
+        'blue': 50,
+        'green': 100,
+        'red': 150,
+        'yellow': 200
+    }
 
     for (let i = 0; i < howMany; i++) {
         let color = creepColors[Math.floor(Math.random()*creepColors.length)];
         let creepType = Math.floor(Math.random() * creepTypes + 1);
-        creeps.push(createCreep(creepType, color, creepHealth));
+        creeps.push(createCreep(creepType, color, creepHealth[color]));
     }
     return creeps;
 }
@@ -71,7 +76,7 @@ function getNextPos(creep) {
     }
 }
 
-function createLevel(id, entrance, exit, howManyCreeps, duration) {
+function createLevel(id, entrance, exit, howManyCreeps, duration, numWaves) {
     let gridPos = {};
     gridPos['left'] = {row: Math.floor(gameModel.GRID_SIZE / 2), col: 0};
     gridPos['right'] = {row: Math.floor(gameModel.GRID_SIZE / 2), col: gameModel.GRID_SIZE-1};
@@ -90,6 +95,7 @@ function createLevel(id, entrance, exit, howManyCreeps, duration) {
     for (let i = 0; i < gameModel.activeCreeps.length; i++) {
         // Randomly generate the time the creeps enter the arena
         gameModel.activeCreeps[i].enterTime = duration * Random.nextDouble();
+        gameModel.activeCreeps[i].enterTime = duration * Random.nextDouble();
         gameModel.activeCreeps[i].path = JSON.parse(JSON.stringify(path)); // Deep copy
         gameModel.activeCreeps[i].path.unshift('end');
         gameModel.activeCreeps[i].canvasEnd = canvasPos[exit];
@@ -98,8 +104,14 @@ function createLevel(id, entrance, exit, howManyCreeps, duration) {
     return {
         id: id,
         entrance: gridPos[entrance],
+        entranceString: entrance,
         exit: gridPos[exit],
+        exitString: exit,
+        numCreeps: howManyCreeps,
+        duration: duration,
+        waves: numWaves,
         startTime: 0,
-        elapsedTime: 0
+        elapsedTime: 0,
+        finished: false
     }
 }

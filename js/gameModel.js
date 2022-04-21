@@ -28,7 +28,8 @@ const initializeGameModel = () => {
       this.towerMenu = initializeTowerMenu();
       this.selectedTowerMenu = null;
       this.currentMoney = 1000;
-      this.currentLevel = createLevel(1, 'left', 'right', 10, 30);
+      this.currentLevel = createLevel(1, 'left', 'right', 10, 30, 3);
+      this.levelNum = 1;
       this.startLevel = false;
     },
 
@@ -99,6 +100,22 @@ const initializeGameModel = () => {
           }
         }
 
+        if (gameModel.activeCreeps.length === 0) {
+            this.currentLevel.finished = true;
+            this.startLevel = false;
+            // create next level
+            let id = this.currentLevel + 1;
+            let openings = ['left', 'right', 'top', 'bottom'];
+            let entrance = id === 2 ? 'top' : openings[Math.floor(Math.random() * openings.length)];
+            let idx = openings.findIndex(x => x === entrance);
+            openings.splice(idx, 1);
+            let exit = id === 2 ? 'bottom' : openings[Math.floor(Math.random() * openings.length)];
+            let numCreeps = this.currentLevel.numCreeps * 1.5;  // Increase number of creeps by 50%
+            let duration = this.currentLevel.duration * 1.2;  // Increase duration by 20%
+            this.currentLevel = createLevel(id, entrance, exit, numCreeps, duration, this.currentLevel.waves);
+            this.levelNum++;
+        }
+
     },
 
     render() {
@@ -162,6 +179,13 @@ const initializeGameModel = () => {
           drawTowerRange(gameModel.selectedTower);
           drawSelectedTowerMenu(gameModel.selectedTower, gameModel.selectedTowerMenu);
         }
+
+        if (!this.startLevel) {
+            drawLevelInfo();
+        }
+
+
+
     },
   }
 

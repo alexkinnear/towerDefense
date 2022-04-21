@@ -198,3 +198,9 @@ const drawSelectedTowerMenu = (tower, selectedTowerMenu) => {
   }
   
 }
+
+function drawLevelInfo() {
+  drawText(`Level ${gameModel.levelNum}`, {x: 10, y: 40}, 'arial', '#FF0000', '#000000', 0);
+  drawText(`Entrance: ${gameModel.currentLevel.entranceString}`, {x: 10, y: 55}, 'arial', '#FF0000', '#000000', 0);
+  drawText(`Exit: ${gameModel.currentLevel.exitString}`, {x: 10, y: 70}, 'arial', '#FF0000', '#000000', 0);
+}
