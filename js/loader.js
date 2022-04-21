@@ -125,6 +125,45 @@
             console.log('error: ', error);
         }
     );
+
+    // load confetti texture
+    loadAsset(
+        `assets/confetti.png`,
+        function(asset) {
+            console.log(`confetti.png loaded: ${asset.width}, ${asset.height}`);
+            // console.log('asset: ', asset);
+            gameModel.assets[`confettiParticle`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load firework texture
+    loadAsset(
+        `assets/firework.png`,
+        function(asset) {
+            console.log(`firework.png loaded: ${asset.width}, ${asset.height}`);
+            // console.log('asset: ', asset);
+            gameModel.assets[`fireworkParticle`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load green explosion texture
+    loadAsset(
+        `assets/greenExplosion.png`,
+        function(asset) {
+            console.log(`greenExplosion.png loaded: ${asset.width}, ${asset.height}`);
+            // console.log('asset: ', asset);
+            gameModel.assets[`greenExplosionParticle`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
     
 
 }());

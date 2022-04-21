@@ -180,6 +180,13 @@ function updateTowerAngle(tower) {
     if (tower.name === 'Air Seeker') type = 'air';
     else if (tower.name === 'Heat Seeker') type = 'hybrid';
     else type = 'ground';
+    let bomb = tower.name === 'Bomber';
+
+    let color = null;
+    if (tower.name === 'Gunner') color = '#ADD8E6';
+    else if (tower.name === 'Bomber') color = '#B5651D';
+    else if (tower.name === 'Air Seeker') color = '#3CB371';
+    else color = '#EE4B2B';
 
     let angleInfo = computeAngle(tower.rotation - Math.PI / 2, tower.center, creep.center);
     let tolerance = 0.05;
@@ -197,7 +204,7 @@ function updateTowerAngle(tower) {
           if (tower.elapsedTime - tower.lastBulletTimeStamp >= tower.fireRate && tower.name !== 'bomber') {
             let center = {x: tower.center.x, y: tower.center.y};
             let damage = tower.damage;
-            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, false, damage, type));
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, color, creep, false, damage, type, bomb));
             gameModel.bulletId++;
             tower.lastBulletTimeStamp = tower.elapsedTime;
           }
@@ -218,7 +225,7 @@ function updateTowerAngle(tower) {
             let center = {x: tower.center.x, y: tower.center.y};
             let guided = tower.name === 'Air Seeker';
             let damage = tower.damage;
-            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type));
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb));
             gameModel.bulletId++;
             tower.lastBulletTimeStamp = tower.elapsedTime;
           }
@@ -264,6 +271,16 @@ const creep = (pos, assetName, maxHealth) => {
       if (this.currentHealth <= 0) {
         let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
         gameModel.activeCreeps.splice(idx, 1);
+        gameModel.explosionParticleSystems.push(
+          ParticleSystem({
+            center: this.center,
+            size: { mean: 4, stdev: 2 },
+            speed: { mean: 200, stdev: 40 },
+            lifetime: { mean: 0.1, stdev: 0.1 },
+            assetName: 'fireParticle',
+            duration: 0.2
+          }),
+        );
       }
 
       if (typeof this.canvasEnd !== 'undefined') {
@@ -485,11 +502,33 @@ function checkCollision(bullet) {
       let idx = gameModel.activeBullets.findIndex(b => b.id === bullet.id);
       gameModel.activeBullets.splice(idx, 1);
       gameModel.activeCreeps[i].currentHealth -= bullet.damage;
+      if (bullet.bomb) {
+        gameModel.explosionParticleSystems.push(
+          ParticleSystem({
+            center: bullet.center,
+            size: { mean: 4, stdev: 2 },
+            speed: { mean: 200, stdev: 40 },
+            lifetime: { mean: 0.2, stdev: 0.1 },
+            assetName: 'fireworkParticle',
+            duration: 0.2
+          }),
+        );
+      }
+      else if (bullet.guided) {
+        ParticleSystem({
+          center: bullet.center,
+          size: { mean: 4, stdev: 2 },
+          speed: { mean: 200, stdev: 40 },
+          lifetime: { mean: 0.2, stdev: 0.1 },
+          assetName: 'greenExplosionParticle',
+          duration: 0.2
+        })
+      }
     }
   }
 }
 
-const bullet = (id, pos, radius, color, target, guided, damage, type) => {
+const bullet = (id, pos, radius, color, target, guided, damage, type, bomb) => {
   return {
     id: id,
     center: pos,
@@ -498,6 +537,7 @@ const bullet = (id, pos, radius, color, target, guided, damage, type) => {
     speed: 3,
     damage: damage,
     type: type,
+    bomb: bomb,
     target: guided ? target : JSON.parse(JSON.stringify(target)),
     guided: guided,
     direction: getDirection(pos, target.center, 3),

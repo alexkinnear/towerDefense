@@ -118,6 +118,30 @@ const initializeGameModel = () => {
 
         for (let bullet of this.activeBullets) {
             drawCircle(bullet.radius, bullet.center, bullet.color);
+            if (bullet.bomb) {
+                gameModel.explosionParticleSystems.push(
+                  ParticleSystem({
+                    center: bullet.center,
+                    size: { mean: 0.5, stdev: 0.25 },
+                    speed: { mean: 200, stdev: 40 },
+                    lifetime: { mean: 0.1, stdev: 0.05 },
+                    assetName: 'fireworkParticle',
+                    duration: 0.2
+                  }),
+                );
+            }
+            else if (bullet.guided) {
+                gameModel.explosionParticleSystems.push(
+                    ParticleSystem({
+                        center: bullet.center,
+                        size: { mean: 0.5, stdev: 0.25 },
+                        speed: { mean: 200, stdev: 40 },
+                        lifetime: { mean: 0.1, stdev: 0.05 },
+                        assetName: 'greenExplosionParticle',
+                        duration: 0.2
+                    }),
+                );
+            }
         }
 
         for (let system of this.explosionParticleSystems) {
