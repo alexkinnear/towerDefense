@@ -44,19 +44,6 @@
         }
     }
 
-    // Load the groundCreep.png asset
-    // loadAsset(
-    //     'assets/groundCreep.png',
-    //     function(asset) {
-    //         console.log(`groundCreep.png loaded: ${asset.width}, ${asset.height}`);
-    //         console.log('asset: ', asset);
-    //         gameModel.assets['groundCreep'] = asset;
-    //     },
-    //     function(error) {
-    //         console.log('error: ', error);
-    //     }
-    // );
-
     // Load all creep assets
     const creepTypes = 3;
     const creepColors = ['blue', 'green', 'red', 'yellow']
@@ -70,7 +57,6 @@
                     `assets/creep/creep-${creepType}-${color}/${frame}.png`,
                     function(asset) {
                         console.log(`creep-${creepType}-${color}/${frame}.png loaded: ${asset.width}, ${asset.height}`);
-                        // console.log('asset: ', asset);
                         gameModel.assets[`creep-${creepType}-${color}/${frame}`] = asset;
                     },
                     function(error) {
@@ -91,7 +77,6 @@
                 `assets/tower-defense-turrets/turret-${towerType}-${towerLevel}.png`,
                 function(asset) {
                     console.log(`turret-${towerType}-${towerLevel}.png loaded: ${asset.width}, ${asset.height}`);
-                    // console.log('asset: ', asset);
                     gameModel.assets[`turret-${towerType}-${towerLevel}`] = asset;
                 },
                 function(error) {
@@ -105,7 +90,6 @@
         `assets/tower-defense-turrets/turret-base.png`,
         function(asset) {
             console.log(`turret-base.png loaded: ${asset.width}, ${asset.height}`);
-            // console.log('asset: ', asset);
             gameModel.assets[`turret-base`] = asset;
         },
         function(error) {
@@ -118,7 +102,6 @@
         `assets/fire.png`,
         function(asset) {
             console.log(`fire.png loaded: ${asset.width}, ${asset.height}`);
-            // console.log('asset: ', asset);
             gameModel.assets[`fireParticle`] = asset;
         },
         function(error) {
@@ -131,7 +114,6 @@
         `assets/confetti.png`,
         function(asset) {
             console.log(`confetti.png loaded: ${asset.width}, ${asset.height}`);
-            // console.log('asset: ', asset);
             gameModel.assets[`confettiParticle`] = asset;
         },
         function(error) {
@@ -144,7 +126,6 @@
         `assets/firework.png`,
         function(asset) {
             console.log(`firework.png loaded: ${asset.width}, ${asset.height}`);
-            // console.log('asset: ', asset);
             gameModel.assets[`fireworkParticle`] = asset;
         },
         function(error) {
@@ -157,8 +138,19 @@
         `assets/greenExplosion.png`,
         function(asset) {
             console.log(`greenExplosion.png loaded: ${asset.width}, ${asset.height}`);
-            // console.log('asset: ', asset);
             gameModel.assets[`greenExplosionParticle`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load life texture
+    loadAsset(
+        `assets/heart.png`,
+        function(asset) {
+            console.log(`heart.png loaded: ${asset.width}, ${asset.height}`);
+            gameModel.assets[`heart`] = asset;
         },
         function(error) {
             console.log('error: ', error);

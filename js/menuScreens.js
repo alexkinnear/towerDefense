@@ -1,3 +1,19 @@
+const keyToText = (key) => {
+  switch (key) {
+    case ' ':
+      return 'Space Bar';
+    case 'ArrowUp':
+      return 'Up Arrow';
+    case 'ArrowDown':
+      return 'Down Arrow';
+    case 'ArrowLeft':
+      return 'Left Arrow';
+    case 'ArrowRight':
+      return 'Right Arrow';
+    default:
+      return key
+  }
+};
 
 const setupMenuButtons = (game) => {
 
@@ -25,7 +41,9 @@ const setupMenuButtons = (game) => {
     controls: {
       htmlElement: document.getElementById('controls-menu'),
       buttons: {
-        upgrade: document.getElementById('upgrade'),
+        path1: document.getElementById('path-1'),
+        path2: document.getElementById('path-2'),
+        path3: document.getElementById('path-3'),
         sell: document.getElementById('sell'),
         nextLevel: document.getElementById('nextLevel'),
         back: document.getElementById('controls-back'),
@@ -43,6 +61,9 @@ const setupMenuButtons = (game) => {
   const setScreen = (screenElement) => {
     game.activeScreen.classList.remove('active')
     screenElement.classList.add('active');
+    if (screenElement.id === 'game-screen') {
+      screenElement.classList.add('active-row');
+    }
     game.activeScreen = screenElement;
   }
 
@@ -89,33 +110,31 @@ const setupMenuButtons = (game) => {
   });
 
   // Controls menu
-  let {upgrade, sell, nextLevel} = controls.buttons;
-
-  const keyToText = (key) => {
-    switch (key) {
-      case ' ':
-        return 'Space Bar';
-      case 'ArrowUp':
-        return 'Up Arrow';
-      case 'ArrowDown':
-        return 'Down Arrow';
-      case 'ArrowLeft':
-        return 'Left Arrow';
-      case 'ArrowRight':
-        return 'Right Arrow';
-      default:
-        return key
-    }
-  };
-
+  let {path1, path2, path3, sell, nextLevel} = controls.buttons;
 
   let keyIsBeingChanged = false;
 
-  const changeUpgradeKey = (e) => {
-    game.keyboard.unRegisterKey('upgrade')
-    game.keyboard.registerKey(e.key, game.upgradeSelected, 'upgrade');
-    window.removeEventListener('keydown', changeUpgradeKey);
-    upgrade.innerHTML = `Upgrade selected tower: ${keyToText(e.key)}`;
+  const changePath1Key = (e) => {
+    game.keyboard.unRegisterKey('path1')
+    game.keyboard.registerKey(e.key, game.upgradeSelected1, 'path1');
+    window.removeEventListener('keydown', changePath1Key);
+    path1.innerHTML = `Upgrade tower (path 1): ${keyToText(e.key)}`;
+    keyIsBeingChanged = false;
+  };
+
+  const changePath2Key = (e) => {
+    game.keyboard.unRegisterKey('path2')
+    game.keyboard.registerKey(e.key, game.upgradeSelected2, 'path2');
+    window.removeEventListener('keydown', changePath2Key);
+    path2.innerHTML = `Upgrade tower (path 2): ${keyToText(e.key)}`;
+    keyIsBeingChanged = false;
+  };
+
+  const changePath3Key = (e) => {
+    game.keyboard.unRegisterKey('path3')
+    game.keyboard.registerKey(e.key, game.upgradeSelected3, 'path3');
+    window.removeEventListener('keydown', changePath3Key);
+    path3.innerHTML = `Upgrade tower (path 3): ${keyToText(e.key)}`;
     keyIsBeingChanged = false;
   };
 
@@ -145,9 +164,21 @@ const setupMenuButtons = (game) => {
     return false;
   }
 
-  upgrade.addEventListener('click', (e) => {
-    if (promptForKeyChange(upgrade)) {
-      window.addEventListener('keydown', changeUpgradeKey);;
+  path1.addEventListener('click', (e) => {
+    if (promptForKeyChange(path1)) {
+      window.addEventListener('keydown', changePath1Key);;
+    }
+  });
+
+  path2.addEventListener('click', (e) => {
+    if (promptForKeyChange(path2)) {
+      window.addEventListener('keydown', changePath2Key);;
+    }
+  });
+
+  path3.addEventListener('click', (e) => {
+    if (promptForKeyChange(path3)) {
+      window.addEventListener('keydown', changePath3Key);;
     }
   });
 
@@ -173,11 +204,19 @@ const setupMenuButtons = (game) => {
   });
 
   // load configurable keys, so the controls menu will display the right keys
-  let upgradeKey = 'u';
+  let path1Key = '1';
+  let path2Key = '2';
+  let path3Key = '3';
   let sellKey = 's';
   let nextLevelKey = 'g';
-  if (localStorage['upgrade']) {
-    upgradeKey = localStorage['upgrade'];
+  if (localStorage['path1']) {
+    path1Key = localStorage['path1'];
+  }
+  if (localStorage['path2']) {
+    path2Key = localStorage['path2'];
+  }
+  if (localStorage['path3']) {
+    path3Key = localStorage['path3'];
   }
   if (localStorage['sell']) {
     sellKey = localStorage['sell'];
@@ -186,8 +225,12 @@ const setupMenuButtons = (game) => {
     nextLevelKey = localStorage['nextLevel'];
   }
 
-  gameModel.keyboard.registerKey(upgradeKey, gameModel.upgradeSelected, 'upgrade');
-  upgrade.innerHTML = `Upgrade selected tower: ${keyToText(upgradeKey)}`;
+  gameModel.keyboard.registerKey(path1Key, gameModel.upgradeSelected1, 'path1');
+  path1.innerHTML = `Upgrade tower (path 1): ${keyToText(path1Key)}`;
+  gameModel.keyboard.registerKey(path2Key, gameModel.upgradeSelected2, 'path2');
+  path2.innerHTML = `Upgrade tower (path 2): ${keyToText(path2Key)}`;
+  gameModel.keyboard.registerKey(path3Key, gameModel.upgradeSelected3, 'path3');
+  path3.innerHTML = `Upgrade tower (path 3): ${keyToText(path3Key)}`;
   gameModel.keyboard.registerKey(sellKey, gameModel.sellSelected, 'sell');
   sell.innerHTML = `Sell selected tower: ${keyToText(sellKey)}`;
   gameModel.keyboard.registerKey(nextLevelKey, gameModel.startNextLevel, 'nextLevelKey');
@@ -229,19 +272,7 @@ const setupMenuButtons = (game) => {
 
   const checkForSellButtonClick = (clickPos, {sellButton}) => {
     if (mouseCollidesWithRect(clickPos, sellButton)) {
-      gameModel.currentMoney += Math.round(gameModel.selectedTower.price * 0.7);
-      const idx = gameModel.activeTowers.indexOf(gameModel.selectedTower);
-      gameModel.explosionParticleSystems.push(
-        ParticleSystem({
-          center: { x: gameModel.selectedTower.center.x, y: gameModel.selectedTower.center.y },
-          size: { mean: 20, stdev: 4 },
-          speed: { mean: 200, stdev: 100 },
-          lifetime: { mean: 0.2, stdev: 0.1 },
-          assetName: 'confettiParticle',
-          duration: 0.1
-        }),
-      );
-      gameModel.activeTowers.splice(idx, 1);
+      gameModel.sellSelected();
     }
   }
 

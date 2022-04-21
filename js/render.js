@@ -174,6 +174,9 @@ const drawUpgradeMenu = (upgradePath, selectedTowerMenu, tower) => {
   let topLeft = {x: center.x - size.x / 2, y: center.y - size.y / 2}
   drawRectangle(size, center, "#777777");
   
+  drawText(upgradePath + 1, {x: topLeft.x + size.x - 25, y: topLeft.y}, menuFont, menuColors.effect, 'black', 0);
+
+
   //account for max level towers
   if (tower.level > 2) {
     drawText('Fully Upgraded', {x: topLeft.x + 10, y: topLeft.y}, menuFont, menuColors.name, 'black', 0);
@@ -218,4 +221,16 @@ function drawScoreIndicator(scoreIndicator) {
 
 function drawScore(score) {
   drawText(score, {x: 10, y: 40}, '24px arial', menuColors.effect, 'black', 0);
+}
+
+function drawLives(lives) {
+  const firstLife = {x: 925, y: 25};
+  for (let i = 0; i < lives; i++) {
+    renderTexture({
+      center: {x: firstLife.x + i * 25, y: firstLife.y},
+      size: {x: 25, y: 25},
+      assetName: 'heart',
+      rotation: 0,
+    })
+  }
 }

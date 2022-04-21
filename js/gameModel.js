@@ -12,6 +12,8 @@ const initializeGameModel = () => {
     newGame() {
       // Things that need to be reset each time a new game is started
       this.score = 0;
+      this.lives = 3;
+      this.gameOver = false;
       this.selectedTower = null;
       this.isRunning = true;
       this.GRID_SIZE = 16;
@@ -32,6 +34,36 @@ const initializeGameModel = () => {
       this.currentLevel = createLevel(1, 'left', 'right', 30, 45, 3);
       this.levelNum = 1;
       this.startLevel = false;
+      this.loadKeys();
+    },
+
+    loadKeys() {
+      // load configurable keys, so the controls display will show the right info
+      let path1Key = '1';
+      let path2Key = '2';
+      let path3Key = '3';
+      let sellKey = 's';
+      let nextLevelKey = 'g';
+      if (localStorage['path1']) {
+        path1Key = localStorage['path1'];
+      }
+      if (localStorage['path2']) {
+        path2Key = localStorage['path2'];
+      }
+      if (localStorage['path3']) {
+        path3Key = localStorage['path3'];
+      }
+      if (localStorage['sell']) {
+        sellKey = localStorage['sell'];
+      }
+      if (localStorage['nextLevel']) {
+        nextLevelKey = localStorage['nextLevel'];
+      }
+      document.getElementById('path-1-display').innerHTML = `Upgrade path 1: [${keyToText(path1Key)}]`;
+      document.getElementById('path-2-display').innerHTML = `Upgrade path 2: [${keyToText(path2Key)}]`;
+      document.getElementById('path-3-display').innerHTML = `Upgrade path 3: [${keyToText(path3Key)}]`;
+      document.getElementById('sell-display').innerHTML = `Sell tower: [${keyToText(sellKey)}]`;
+      document.getElementById('next-level-display').innerHTML = `Start next level: [${keyToText(nextLevelKey)}]`;
     },
 
     addOneOfEachCreep() { // testing function
@@ -62,14 +94,41 @@ const initializeGameModel = () => {
       }
     },
 
-    upgradeSelected() {
-        // TODO: Implement this
-        console.log(this.selectedTower);
+    upgradeSelected1() {
+      if (gameModel.selectedTower) {
+        gameModel.selectedTower.upgrade(0);
+      }
+    },
+
+    upgradeSelected2() {
+      if (gameModel.selectedTower) {
+        gameModel.selectedTower.upgrade(1);
+      }
+    },
+
+    upgradeSelected3() {
+      if (gameModel.selectedTower) {
+        gameModel.selectedTower.upgrade(2);
+      }
     },
 
     sellSelected() {
-        // TODO: Implement this
-        console.log(this.selectedTower);
+        if (gameModel.selectedTower) {
+          gameModel.currentMoney += Math.round(gameModel.selectedTower.price * 0.7);
+          const idx = gameModel.activeTowers.indexOf(gameModel.selectedTower);
+          gameModel.explosionParticleSystems.push(
+            ParticleSystem({
+              center: { x: gameModel.selectedTower.center.x, y: gameModel.selectedTower.center.y },
+              size: { mean: 20, stdev: 4 },
+              speed: { mean: 200, stdev: 100 },
+              lifetime: { mean: 0.2, stdev: 0.1 },
+              assetName: 'confettiParticle',
+              duration: 0.1
+            }),
+          );
+          gameModel.activeTowers.splice(idx, 1);
+          gameModel.selectedTower = null;
+        }
     },
 
     startNextLevel() {
@@ -80,6 +139,7 @@ const initializeGameModel = () => {
         this.prevTime = this.elapsedTime;
         this.elapsedTime += elapsedTime;
         this.keyboard.processInput();
+
         for (let creep of this.activeCreeps) {
             creep.update(elapsedTime);
         }
@@ -119,6 +179,10 @@ const initializeGameModel = () => {
             let duration = this.currentLevel.duration * 1.2;  // Increase duration by 20%
             this.currentLevel = createLevel(id, entrance, exit, numCreeps, duration, this.currentLevel.waves);
             this.levelNum++;
+        }
+
+        if (this.lives < 1) {
+          this.gameOver = true;
         }
 
     },
@@ -177,6 +241,7 @@ const initializeGameModel = () => {
           drawScoreIndicator(indicator);
         }
 
+        drawLives(this.lives);
         drawScore(this.score);
 
         drawTowerMenu(gameModel.towerMenu);
@@ -195,7 +260,10 @@ const initializeGameModel = () => {
             drawLevelInfo();
         }
 
-
+        if (this.gameOver) {
+          //TODO: render gameOverScreen
+          console.log("GAME OVER");
+        }
 
     },
   }

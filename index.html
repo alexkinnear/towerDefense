@@ -28,7 +28,9 @@
 
         <div id="controls-menu" class="screen">
             <h1 class="title">Controls</h1>
-            <button id='upgrade' class="menu-button">Upgrade selected tower: u</button>
+            <button id='path-1' class="menu-button">Upgrade tower (path 1): 1</button>
+            <button id='path-2' class="menu-button">Upgrade tower (path 2): 2</button>
+            <button id='path-3' class="menu-button">Upgrade tower (path 3): 3</button>
             <button id='sell' class="menu-button">Sell selected tower: s</button>
             <button id='nextLevel' class="menu-button">Start the next level: g</button>
             <button id='controls-back' class="menu-button">Back</button>
@@ -49,6 +51,13 @@
         </div>
         
         <div id="game-screen" class="screen">
+            <div id="controls-display">
+                <h2 id="path-1-display">Upgrade path 1: 1</h2>
+                <h2 id="path-2-display">Upgrade path 2: 2</h2>
+                <h2 id="path-3-display">Upgrade path 3: 3</h2>
+                <h2 id="sell-display">Sell tower: s</h2>
+                <h2 id="next-level-display">Start next level: g</h2>
+            </div>
             <canvas id="game-canvas" class="game-canvas" width="1000" height="1000"></canvas>
         </div>
         <script src="js/random.js"></script>

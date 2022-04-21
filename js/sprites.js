@@ -291,6 +291,7 @@ const creep = (pos, assetName, maxHealth) => {
         if (Math.abs(this.center.x - this.canvasEnd.x) < 0.5 && Math.abs(this.center.y - this.canvasEnd.y) < 0.5) {
           let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
           gameModel.activeCreeps.splice(idx, 1);
+          gameModel.lives -= 1;
         }
       }
 
@@ -346,6 +347,10 @@ const tower = (pos,
       }
     },
     upgrade(upgradePath) {
+      if (this.chosenUpgradePath !== null && upgradePath !== this.chosenUpgradePath || this.level > 2) {
+        return;
+      }
+
       const nextUpgrade = this.upgradePaths[upgradePath][this.level - 1]
       const changingAttribute = Object.keys(nextUpgrade)[0];
 
