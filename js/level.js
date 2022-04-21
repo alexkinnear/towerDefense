@@ -76,12 +76,34 @@ function getNextPos(creep) {
     }
 }
 
-function createLevel(id, entrance, exit, howManyCreeps, duration, numWaves) {
+function getEntranceandExitPos() {
     let gridPos = {};
-    gridPos['left'] = {row: Math.floor(gameModel.GRID_SIZE / 2), col: 0};
-    gridPos['right'] = {row: Math.floor(gameModel.GRID_SIZE / 2), col: gameModel.GRID_SIZE-1};
-    gridPos['top'] = {row: 0, col: Math.floor(gameModel.GRID_SIZE / 2 - 1)};
-    gridPos['bottom'] = {row: gameModel.GRID_SIZE-1, col: Math.floor(gameModel.GRID_SIZE / 2 - 1)}
+    let entrancePriority = [7, 8, 9, 6];
+    while (entrancePriority.length > 0) {
+        let gp = entrancePriority.pop();
+        if (isOpenSpace(gp, 0)) {
+            gridPos['left'] = {row: gp, col: 0};
+        }
+        if (isOpenSpace(gp, 15)) {
+            gridPos['right'] = {row: gp, col: 15};
+        }
+        if (isOpenSpace(0, gp)) {
+            gridPos['top'] = {row: 0, col: gp};
+        }
+        if (isOpenSpace(15, gp)) {
+            gridPos['bottom'] = {row: 15, col: gp};
+        }
+    }
+    return gridPos;
+}
+
+function createLevel(id, entrance, exit, howManyCreeps, duration, numWaves) {
+
+    let gridPos = getEntranceandExitPos();
+    // gridPos['left'] = {row: Math.floor(gameModel.GRID_SIZE / 2), col: 0};
+    // gridPos['right'] = {row: Math.floor(gameModel.GRID_SIZE / 2), col: gameModel.GRID_SIZE-1};
+    // gridPos['top'] = {row: 0, col: Math.floor(gameModel.GRID_SIZE / 2 - 1)};
+    // gridPos['bottom'] = {row: gameModel.GRID_SIZE-1, col: Math.floor(gameModel.GRID_SIZE / 2 - 1)};
 
     let canvasPos = {};
     canvasPos['left'] = {x: 0, y: canvas.height / 2};
@@ -96,7 +118,6 @@ function createLevel(id, entrance, exit, howManyCreeps, duration, numWaves) {
         bounds['max'] = duration/numWaves*i + duration / numWaves / 2;
         waves.push(bounds);
     }
-    console.log(waves);
 
     // fill out the creeps list with the level's creeps
     gameModel.activeCreeps = createCreeps(howManyCreeps);
@@ -104,9 +125,7 @@ function createLevel(id, entrance, exit, howManyCreeps, duration, numWaves) {
     for (let i = 0; i < gameModel.activeCreeps.length; i++) {
         // Randomly generate the time the creeps enter the arena
         let whichWave = waves[Math.floor(Math.random() * waves.length)];
-        console.log(whichWave.max, whichWave.min);
         gameModel.activeCreeps[i].enterTime = Math.random() * (whichWave.max - whichWave.min) + whichWave.min;
-        console.log(gameModel.activeCreeps[i].enterTime);
         gameModel.activeCreeps[i].path = JSON.parse(JSON.stringify(path)); // Deep copy
         gameModel.activeCreeps[i].path.unshift('end');
         gameModel.activeCreeps[i].canvasEnd = canvasPos[exit];

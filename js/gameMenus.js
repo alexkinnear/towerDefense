@@ -22,7 +22,17 @@ const isInGrid = (tower) => {
 const doesntBlockPath = (tower) => {
   // TODO: make sure tower doesn't block paths between any 2 exits
   // Check left to right
-  return true;
+  let towerGrid = convertCanvasLocationToGridPos(tower.center);
+  gameModel.grid[towerGrid.row][towerGrid.col].push(tower);
+  let gp = getEntranceandExitPos();
+  if (typeof gp['left'] === 'undefined' || typeof gp['right'] === 'undefined' || typeof gp['top'] === 'undefined' || typeof gp['bottom'] === 'undefined') {
+    gameModel.grid[towerGrid.row][towerGrid.col].pop();
+    return false;
+  }
+  let leftToRight = getShortestPath(gp['left'], gp['right']).length > 0;
+  let topToBottom = getShortestPath(gp['top'], gp['bottom']).length > 0;
+  gameModel.grid[towerGrid.row][towerGrid.col].pop();
+  return leftToRight && topToBottom;
 }
 
 const attemptToPlace = (tower) => {
@@ -33,8 +43,12 @@ const attemptToPlace = (tower) => {
       gameModel.activeTowers.push(gameModel.placingTower);
       gameModel.currentMoney -= tower.price;
 
-      // updateCreepPaths having some issues
+      let gp = getEntranceandExitPos();
+      gameModel.currentLevel.entrance = gp[gameModel.currentLevel.entranceString];
+      gameModel.currentLevel.exit = gp[gameModel.currentLevel.exitString];
+      gameModel.currentLevel.exit = gp[gameModel.currentLevel.exitString];
       updateCreepPaths();
+
     }
   }
 }

@@ -29,7 +29,7 @@ const initializeGameModel = () => {
       this.towerMenu = initializeTowerMenu();
       this.selectedTowerMenu = null;
       this.currentMoney = 1000;
-      this.currentLevel = createLevel(1, 'left', 'right', 10, 30, 3);
+      this.currentLevel = createLevel(1, 'left', 'right', 30, 45, 3);
       this.levelNum = 1;
       this.startLevel = false;
     },

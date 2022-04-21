@@ -573,11 +573,17 @@ const bullet = (id, pos, radius, color, target, guided, damage, type, bomb) => {
 
       checkCollision(this);
 
-      // Not removing bullets properly
       if (outOfBounds(this.center)) {
         let idx = gameModel.activeBullets.findIndex(b => b.id === this.id);
         gameModel.activeBullets.splice(idx, 1);
       }
+
+      if (this.direction.dx < 0.001 && this.direction.dy < 0.001) {
+        let idx = gameModel.activeBullets.findIndex(b => b.id === this.id);
+        gameModel.activeBullets.splice(idx, 1);
+      }
+
+
     }
   }
 }
