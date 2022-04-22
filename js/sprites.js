@@ -90,10 +90,10 @@ function updateCreepPaths() {
     if (gameModel.activeCreeps[i].type === 'ground') {
       let creep = gameModel.activeCreeps[i];
       if (creep.gridPos.row === -1) {
-        creep.path = getShortestPath(gameModel.currentLevel.entrance, gameModel.currentLevel.exit, false);
+        creep.path = getShortestPath(gameModel.currentLevel.entrance, gameModel.currentLevel.exit);
       }
       else {
-        creep.path = getShortestPath(creep.gridPos, gameModel.currentLevel.exit, false);
+        creep.path = getShortestPath(creep.gridPos, gameModel.currentLevel.exit);
       }
       creep.path.unshift('end');
     }
@@ -544,42 +544,82 @@ function checkCollision(bullet) {
       let idx = gameModel.activeBullets.findIndex(b => b.id === bullet.id);
       gameModel.activeBullets.splice(idx, 1);
       const creepHit = gameModel.activeCreeps[i];
-      creepHit.currentHealth -= bullet.damage;
-      if (bullet.effect !== null) {
-        switch (bullet.effect) {
-          case 'Slow':
-            if (!creepHit.slowed) {
-              creepHit.speed *= 0.6;
-              creepHit.slowed = true;
+      const creepsHit = [];
+      creepsHit.push(creepHit);
+      if (bullet.bomb) {
+        for (let j = 0; j < gameModel.activeCreeps.length; j++) {
+          if (distance(bullet.center, gameModel.activeCreeps[j].center) < canvas.width / 16 && gameModel.activeCreeps[j].id !== creepHit.id) {
+            creepsHit.push(gameModel.activeCreeps[j]);
+          }
+        }
+        for (let k = 0; k < creepsHit.length; k++) {
+          let creepHit = creepsHit[k];
+          creepHit.currentHealth -= bullet.damage;
+          if (bullet.effect !== null) {
+            switch (bullet.effect) {
+              case 'Slow':
+                if (!creepHit.slowed) {
+                  creepHit.speed *= 0.6;
+                  creepHit.slowed = true;
+                }
+                break;
+              case 'Poison Bomb':
+                if (!creepHit.poisoned) {
+                  creepHit.poisoned = true;
+                  creepHit.poisonSystem = ParticleSystem({
+                    center: creepHit.center,
+                    size: { mean: 10, stdev: 2 },
+                    speed: { mean: 40, stdev: 15 },
+                    lifetime: { mean: 0.2, stdev: 0.1 },
+                    assetName: 'poisonParticle',
+                    duration: 30,
+                  })
+                }
+                break;
             }
-            break;
-          case 'Poison Bomb':
-            if (!creepHit.poisoned) {
-              creepHit.poisoned = true;
-              creepHit.poisonSystem = ParticleSystem({
-                center: creepHit.center,
-                size: { mean: 10, stdev: 2 },
-                speed: { mean: 40, stdev: 15 },
-                lifetime: { mean: 0.2, stdev: 0.1 },
-                assetName: 'poisonParticle',
-                duration: 30,
-              })
-            }
-            break;
+          }
         }
       }
+      else {
+        let creepHit = gameModel.activeCreeps[i];
+        creepHit.currentHealth -= bullet.damage;
+        if (bullet.effect !== null) {
+          switch (bullet.effect) {
+            case 'Slow':
+              if (!creepHit.slowed) {
+                creepHit.speed *= 0.6;
+                creepHit.slowed = true;
+              }
+              break;
+            case 'Poison Bomb':
+              if (!creepHit.poisoned) {
+                creepHit.poisoned = true;
+                creepHit.poisonSystem = ParticleSystem({
+                  center: creepHit.center,
+                  size: { mean: 10, stdev: 2 },
+                  speed: { mean: 40, stdev: 15 },
+                  lifetime: { mean: 0.2, stdev: 0.1 },
+                  assetName: 'poisonParticle',
+                  duration: 30,
+                })
+              }
+              break;
+          }
+        }
+      }
+
       if (bullet.bomb) {
         const audioClone = gameModel.assets['boomSound'].cloneNode();
         audioClone.play();
         gameModel.explosionParticleSystems.push(
-          ParticleSystem({
-            center: bullet.center,
-            size: { mean: 4, stdev: 2 },
-            speed: { mean: 200, stdev: 40 },
-            lifetime: { mean: 0.2, stdev: 0.1 },
-            assetName: 'fireworkParticle',
-            duration: 0.2
-          }),
+            ParticleSystem({
+              center: bullet.center,
+              size: { mean: 4, stdev: 2 },
+              speed: { mean: 200, stdev: 40 },
+              lifetime: { mean: 0.2, stdev: 0.1 },
+              assetName: 'fireworkParticle',
+              duration: 0.2
+            }),
         );
       }
       else if (bullet.guided) {

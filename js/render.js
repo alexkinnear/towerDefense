@@ -224,10 +224,117 @@ const drawSelectedTowerMenu = (tower, selectedTowerMenu) => {
   drawSellButton(selectedTowerMenu);
 }
 
-function drawLevelInfo() {
-  drawText(`Level ${gameModel.levelNum}`, {x: 10, y: 70}, 'arial', '#FF0000', '#000000', 0);
-  drawText(`Entrance: ${gameModel.currentLevel.entranceString}`, {x: 10, y: 85}, 'arial', '#FF0000', '#000000', 0);
-  drawText(`Exit: ${gameModel.currentLevel.exitString}`, {x: 10, y: 100}, 'arial', '#FF0000', '#000000', 0);
+function drawExitArrow() {
+  context.strokeStyle = 'rgba(0, 130, 200, 1)';
+  context.fillStyle = 'rgba(255, 255, 255, 1)';
+  context.lineWidth = 5;
+  let arrowWidth = 20;
+  let arrowLength = 40;
+  let offset = gameModel.GRID_OFFSET;
+  context.beginPath();
+  if (gameModel.currentLevel.exitString === 'right') {
+    let x = canvas.width - offset;
+    let  y = canvas.height / 2 - (arrowWidth / 2)
+    context.moveTo(x, y);
+    x += arrowLength;
+    context.lineTo(x, y);
+    y -= arrowWidth / 2;
+    context.lineTo(x, y);
+    while (y < canvas.height / 2) {
+      x++;
+      y++;
+    }
+    context.lineTo(x, y);
+    while (y < canvas.height / 2 + arrowWidth) {
+      x--;
+      y++;
+    }
+    context.lineTo(x, y);
+    y -= arrowWidth / 2;
+    context.lineTo(x, y);
+    x -= arrowLength;
+    context.lineTo(x, y);
+    y -= arrowWidth;
+    context.lineTo(x, y);
+  }
+  else if (gameModel.currentLevel.exitString === 'left') {
+    let x = offset;
+    let  y = canvas.height / 2 - (arrowWidth / 2)
+    context.moveTo(x, y);
+    x -= arrowLength;
+    context.lineTo(x, y);
+    y -= arrowWidth / 2;
+    context.lineTo(x, y);
+    while (y < canvas.height / 2) {
+      x--;
+      y++;
+    }
+    context.lineTo(x, y);
+    while (y < canvas.height / 2 + arrowWidth) {
+      x++;
+      y++;
+    }
+    context.lineTo(x, y);
+    y -= arrowWidth / 2;
+    context.lineTo(x, y);
+    x += arrowLength;
+    context.lineTo(x, y);
+    y -= arrowWidth;
+    context.lineTo(x, y);
+  }
+  else if (gameModel.currentLevel.exitString === 'top') {
+    let x = canvas.width / 2 - arrowWidth / 2;
+    let  y = offset;
+    context.moveTo(x, y);
+    y -= arrowLength;
+    context.lineTo(x, y);
+    x -= arrowWidth / 2;
+    context.lineTo(x, y);
+    while (x < canvas.width / 2) {
+      y--;
+      x++;
+    }
+    context.lineTo(x, y);
+    while (x < canvas.width / 2 + arrowWidth) {
+      y++;
+      x++;
+    }
+    context.lineTo(x, y);
+    x -= arrowWidth / 2;
+    context.lineTo(x, y);
+    y += arrowLength;
+    context.lineTo(x, y);
+    x -= arrowWidth;
+    context.lineTo(x, y);
+  }
+  else {
+    let x = canvas.width / 2 - arrowWidth / 2;
+    let  y = canvas.height - offset;
+    context.moveTo(x, y);
+    y += arrowLength;
+    context.lineTo(x, y);
+    x -= arrowWidth / 2;
+    context.lineTo(x, y);
+    while (x < canvas.width / 2) {
+      y++;
+      x++;
+    }
+    context.lineTo(x, y);
+    while (x < canvas.width / 2 + arrowWidth) {
+      y--;
+      x++;
+    }
+    context.lineTo(x, y);
+    x -= arrowWidth / 2;
+    context.lineTo(x, y);
+    y -= arrowLength;
+    context.lineTo(x, y);
+    x -= arrowWidth;
+    context.lineTo(x, y);
+  }
+  context.closePath();
+  context.fill();
+  context.stroke();
 }
 
 function drawScoreIndicator(scoreIndicator) {

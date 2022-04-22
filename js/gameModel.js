@@ -20,6 +20,7 @@ const initializeGameModel = () => {
       this.displayGrid = false;
       this.GRID_OFFSET = canvas.height / 10;
       this.grid = initializeGrid(this.GRID_SIZE, this.GRID_SIZE);
+      this.airPaths = getAirPaths();
       this.creepId = 0;
       this.activeCreeps = [];
       this.activeTowers = [];
@@ -285,7 +286,7 @@ const initializeGameModel = () => {
         }
 
         if (!this.startLevel) {
-            drawLevelInfo();
+            drawExitArrow();
         }
 
         if (this.gameOver) {

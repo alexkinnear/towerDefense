@@ -70,24 +70,31 @@ function getPath(visited) {
     return path;
 }
 
-function getShortestAirPath(start, end) {
-    let temp = JSON.parse(JSON.stringify(gameModel.grid));
-    for (let i = 0; i > gameModel.GRID_SIZE; i++) {
-        for (let j = 0; j < gameModel.GRID_SIZE; j++) {
-            gameModel.grid[i][j] = [];
-        }
-    }
-    let path = getShortestPath(start, end, false);
-    gameModel.grid = temp;
-    return path;
+
+
+function getAirPaths() {
+    let airPaths = {};
+    let left = {row: 7, col: 0};
+    let right = {row: 7, col: 15};
+    let top = {row: 0, col: 7};
+    let bottom = {row: 15, col: 7};
+    airPaths['lefttop'] = getShortestPath(left, top);
+    airPaths['leftright'] = getShortestPath(left, right);
+    airPaths['leftbottom'] = getShortestPath(left, bottom);
+    airPaths['topleft'] = getShortestPath(top, left);
+    airPaths['topright'] = getShortestPath(top, right);
+    airPaths['topbottom'] = getShortestPath(top, bottom);
+    airPaths['rightleft'] = getShortestPath(right, left);
+    airPaths['righttop'] = getShortestPath(right, top);
+    airPaths['rightbottom'] = getShortestPath(right, bottom);
+    airPaths['bottomleft'] = getShortestPath(bottom, left);
+    airPaths['bottomtop'] = getShortestPath(bottom, top);
+    airPaths['bottomright'] = getShortestPath(bottom, right);
+    return airPaths;
 }
 
 // Greedy solution that returns objects with position of the shortest path
-function getShortestPath(start, end, air) {
-    if (air) {
-        return getShortestAirPath(start, end);
-    }
-
+function getShortestPath(start, end) {
     if (!isOpenSpace(start.row, start.col) || !isOpenSpace(end.row, end.col)) {
         return [];
     }

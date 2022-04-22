@@ -5,7 +5,7 @@ function createCreep(creepType, color, creepHealth) {
 
 function createCreeps(howMany) {
     let creeps = [];
-    const creepTypes = gameModel.levelNum > 2 ? 3 : 2;
+    const creepTypes = gameModel.levelNum > 1 ? 3 : 2;
     const creepColors = ['blue', 'green', 'red', 'yellow'];
     const creepHealth = {
         'blue': 50,
@@ -121,14 +121,13 @@ function createLevel(id, entrance, exit, howManyCreeps, duration, numWaves) {
 
     // fill out the creeps list with the level's creeps
     gameModel.activeCreeps = createCreeps(howManyCreeps);
-    let path = getShortestPath(gridPos[entrance], gridPos[exit], false);
-    let airPath = getShortestPath(gridPos[entrance], gridPos[exit], true);
+    let path = getShortestPath(gridPos[entrance], gridPos[exit]);
     for (let i = 0; i < gameModel.activeCreeps.length; i++) {
         // Randomly generate the time the creeps enter the arena
         let whichWave = waves[Math.floor(Math.random() * waves.length)];
         gameModel.activeCreeps[i].enterTime = Math.random() * (whichWave.max - whichWave.min) + whichWave.min;
         if (gameModel.activeCreeps[i].type === 'air') {
-            gameModel.activeCreeps[i].path = JSON.parse(JSON.stringify(airPath));
+            gameModel.activeCreeps[i].path = gameModel.airPaths[entrance+exit];
         }
         else {
             gameModel.activeCreeps[i].path = JSON.parse(JSON.stringify(path)); // Deep copy
