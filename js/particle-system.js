@@ -73,7 +73,7 @@ ParticleSystem = function(spec) {
         //
         // Generate some new particles
         if (timeEmitting < duration) {
-            for (let particle = 0; particle < 20; particle++) {
+            for (let particle = 0; particle < 10; particle++) {
                 //
                 // Assign a unique name to each particle
                 particles[nextName++] = create();

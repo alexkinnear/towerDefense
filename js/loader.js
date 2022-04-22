@@ -31,7 +31,7 @@
                         if (fileExtension === 'mp3') {
                             asset.oncanplaythrough = function() {
                                 asset.oncanplaythrough = null;  // Ugh, what a hack!
-                                window.URL.revokeObjectURL(asset.src);
+                                // window.URL.revokeObjectURL(asset.src);
                                 if (onSuccess) { onSuccess(asset); }
                             };
                         }
@@ -171,7 +171,6 @@
         `assets/Boom.mp3`,
         function(asset) {
             console.log(`Boom.mp3 loaded: ${asset}`);
-            console.log(asset);
             gameModel.assets[`boomSound`] = asset;
         },
         function(error) {
