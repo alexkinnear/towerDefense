@@ -118,6 +118,30 @@
         }
     );
 
+    // load poison texture
+    loadAsset(
+        `assets/poison.png`,
+        function(asset) {
+            console.log(`poison.png loaded: ${asset.width}, ${asset.height}`);
+            gameModel.assets[`poisonParticle`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load slow texture
+    loadAsset(
+        `assets/slow.png`,
+        function(asset) {
+            console.log(`slow.png loaded: ${asset.width}, ${asset.height}`);
+            gameModel.assets[`slowParticle`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
     // load confetti texture
     loadAsset(
         `assets/confetti.png`,

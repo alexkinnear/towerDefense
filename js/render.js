@@ -13,6 +13,21 @@ const renderAnimatedTexture = (texture) => {
     size.x, size.y
   );
 
+  if (texture.slowed) {
+    context.drawImage(
+      gameModel.assets[`slowParticle`],
+      center.x - size.x / 2,
+      center.y - size.y / 2,
+      size.x, size.y
+    );
+    context.drawImage(
+      gameModel.assets[`slowParticle`],
+      center.x - size.x / 2,
+      center.y - size.y / 2,
+      size.x, size.y
+    );
+  }
+
   context.restore();
 }
 

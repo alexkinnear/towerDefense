@@ -206,7 +206,7 @@ function updateTowerAngle(tower) {
             let damage = tower.damage;
             const audioClone = gameModel.assets['pewSound'].cloneNode();
             audioClone.play();
-            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, color, creep, false, damage, type, bomb));
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, color, creep, false, damage, type, bomb, tower.effect));
             gameModel.bulletId++;
             tower.lastBulletTimeStamp = tower.elapsedTime;
           }
@@ -229,7 +229,7 @@ function updateTowerAngle(tower) {
             let damage = tower.damage;
             const audioClone = gameModel.assets['pewSound'].cloneNode();
             audioClone.play();
-            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb));
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb, tower.effect));
             gameModel.bulletId++;
             tower.lastBulletTimeStamp = tower.elapsedTime;
           }
@@ -254,6 +254,9 @@ const creep = (pos, assetName, maxHealth) => {
     rotateRate: Math.PI / 180,
     maxHealth: maxHealth,
     currentHealth: maxHealth,
+    poisoned: false,
+    poisonSystem: null,
+    slowed: false,
     killValue: Math.round(maxHealth / 4),
     animationIndex: 1,
     nextPos: null,
@@ -271,6 +274,9 @@ const creep = (pos, assetName, maxHealth) => {
         updateCreepPos(this);
         updateCreepGridPos(this);
         updateCreepAngle(this);
+        if (this.poisoned) {
+          this.poisonSystem.update(elapsedTime);
+        }
       }
 
       if (this.currentHealth <= 0) {
@@ -300,6 +306,9 @@ const creep = (pos, assetName, maxHealth) => {
       }
 
       if (this.timeLeftOnCurrFrame <= 0) {
+        if (this.poisoned) {
+          this.currentHealth -= 1;
+        }
         this.animationIndex = this.animationIndex + 1;
         if (this.animationIndex === this.numOfFrames + 1) {
           this.animationIndex = 1;
@@ -435,7 +444,7 @@ const airSeekerSpec = {
   sprites: ['turret-5-1', 'turret-5-2', 'turret-5-3'],
   upgradePaths: [
     [{damage: 50, price: 80}, {airRange: 325, price: 80}], // path 0
-    [{fireRate: 1.5, price: 50}, {effect: 'Two Shot', price: 120}], // path 1
+    [{fireRate: 1.5, price: 50}, {effect: 'Rapid Shot', price: 120}], // path 1
     [{airRange: 300, price: 80}, {effect: 'Sonic Missiles', price: 50}], // path 2
   ],
 }
@@ -531,7 +540,31 @@ function checkCollision(bullet) {
     if (collision(bullet, gameModel.activeCreeps[i])) {
       let idx = gameModel.activeBullets.findIndex(b => b.id === bullet.id);
       gameModel.activeBullets.splice(idx, 1);
-      gameModel.activeCreeps[i].currentHealth -= bullet.damage;
+      const creepHit = gameModel.activeCreeps[i];
+      creepHit.currentHealth -= bullet.damage;
+      if (bullet.effect !== null) {
+        switch (bullet.effect) {
+          case 'Slow':
+            if (!creepHit.slowed) {
+              creepHit.speed *= 0.6;
+              creepHit.slowed = true;
+            }
+            break;
+          case 'Poison Bomb':
+            if (!creepHit.poisoned) {
+              creepHit.poisoned = true;
+              creepHit.poisonSystem = ParticleSystem({
+                center: creepHit.center,
+                size: { mean: 10, stdev: 2 },
+                speed: { mean: 40, stdev: 15 },
+                lifetime: { mean: 0.2, stdev: 0.1 },
+                assetName: 'poisonParticle',
+                duration: 30,
+              })
+            }
+            break;
+        }
+      }
       if (bullet.bomb) {
         const audioClone = gameModel.assets['boomSound'].cloneNode();
         audioClone.play();
@@ -560,16 +593,21 @@ function checkCollision(bullet) {
   }
 }
 
-const bullet = (id, pos, radius, color, target, guided, damage, type, bomb) => {
+const bullet = (id, pos, radius, color, target, guided, damage, type, bomb, effect) => {
+  let speed = 3;
+  if (effect === 'Sonic Missiles') {
+    speed = 10;
+  }
   return {
     id: id,
     center: pos,
     radius: radius,
     color: color,
-    speed: 3,
+    speed: speed,
     damage: damage,
     type: type,
     bomb: bomb,
+    effect: effect,
     target: guided ? target : JSON.parse(JSON.stringify(target)),
     guided: guided,
     direction: getDirection(pos, target.center, 3),

@@ -199,6 +199,12 @@ const initializeGameModel = () => {
         }
         for (let creep of this.activeCreeps) {
           renderAnimatedTexture(creep);
+          if (creep.poisoned) {
+            Object.getOwnPropertyNames(creep.poisonSystem.particles).forEach( function(value) {
+              let particle = creep.poisonSystem.particles[value];
+              renderTexture(particle);
+            });
+          }
         }
         for (let creep of this.activeCreeps) {
           drawHealthBar(50, 2, {x: creep.center.x, y: creep.center.y - 35}, creep.currentHealth / creep.maxHealth);
