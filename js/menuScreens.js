@@ -279,6 +279,9 @@ const setupMenuButtons = (game) => {
   // set up mouse listeners
   let mouseCapture = false;
   gameModel.keyboard.register('mousedown', function(e, elapsedTime) {
+    if (gameModel.gameOver) {
+      return;
+    }
     mouseCapture = true;
     if (gameModel.towerMenu.hovered) {
       // copy the sprite from the menu into placingTower
@@ -337,6 +340,9 @@ const setupMenuButtons = (game) => {
   });
 
   gameModel.keyboard.register('mousemove', function(e, elapsedTime) {
+    if (gameModel.gameOver) {
+      return;
+    }
     // detect menu hover
     const mousePos = {
       x : (e.clientX - canvas.offsetLeft) * canvas.width / canvas.clientWidth,
@@ -349,7 +355,7 @@ const setupMenuButtons = (game) => {
       }
     }
 
-    // logic for placing a new tower goes in here
+    // logic for placing a new tower
     if (gameModel.placingTower) {
       let gridPos = convertCanvasLocationToGridPos(mousePos);
       let snappedPos = {};

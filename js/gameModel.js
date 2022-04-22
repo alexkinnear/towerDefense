@@ -25,6 +25,7 @@ const initializeGameModel = () => {
       this.activeTowers = [];
       this.activeBullets = [];
       this.scoreIndicators = [];
+      this.savedScore = false;
       this.bulletId = 0;
       this.placingTower = null;
       this.explosionParticleSystems = [];
@@ -137,6 +138,22 @@ const initializeGameModel = () => {
         gameModel.startLevel = true;
     },
 
+    saveHighScore(newScore) {
+      if (!localStorage['highScores']) {
+        localStorage['highScores'] = JSON.stringify([0, 0, 0, 0, 0]);
+      }
+      let savedScores = JSON.parse(localStorage['highScores']);
+      savedScores.push(newScore);
+      savedScores.sort((a, b) => {
+        if (a > b) return 1;
+        else if (b > a) return -1;
+        else return 0;
+      });
+      savedScores.reverse();
+      savedScores.splice(5, 1);
+      localStorage['highScores'] = JSON.stringify(savedScores);
+    },
+
     update(elapsedTime) {
         this.prevTime = this.elapsedTime;
         this.elapsedTime += elapsedTime;
@@ -183,8 +200,11 @@ const initializeGameModel = () => {
 
         }
 
-        if (this.lives < 1) {
+        if (this.lives < 1 && !this.savedScore) {
           this.gameOver = true;
+          this.selectedTower = null;
+          this.saveHighScore(gameModel.score);
+          this.savedScore = true;
         }
 
     },
@@ -269,8 +289,7 @@ const initializeGameModel = () => {
         }
 
         if (this.gameOver) {
-          //TODO: render gameOverScreen
-          console.log("GAME OVER");
+          drawGameOver();
         }
 
     },

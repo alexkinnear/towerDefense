@@ -249,3 +249,9 @@ function drawLives(lives) {
     })
   }
 }
+
+function drawGameOver() {
+  drawText('Game Over', {x: 350, y: 400}, '64px Arcade', menuColors.damage, 'black', 0);
+  drawText(`Final Score: ${gameModel.score}`, {x: 275, y: 450}, '64px Arcade', menuColors.damage, 'black', 0);
+  drawText('Press [Esc] to exit', {x: 200, y: 500}, '64px Arcade', menuColors.damage, 'black', 0);
+}

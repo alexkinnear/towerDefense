@@ -281,9 +281,12 @@ const creep = (pos, assetName, maxHealth) => {
 
       if (this.currentHealth <= 0) {
         let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
-        gameModel.currentMoney += this.killValue;
+        
         gameModel.activeCreeps.splice(idx, 1);
-        gameModel.score += this.maxHealth;
+        if (!gameModel.gameOver) {
+          gameModel.currentMoney += this.killValue;
+          gameModel.score += this.maxHealth;
+        }
         gameModel.scoreIndicators.push(scoreIndicator({x: this.center.x - this.size.x / 3, y: this.center.y - this.size.y / 2}, `+${this.maxHealth}`));
         gameModel.explosionParticleSystems.push(
           ParticleSystem({
@@ -627,12 +630,11 @@ const bullet = (id, pos, radius, color, target, guided, damage, type, bomb, effe
         gameModel.activeBullets.splice(idx, 1);
       }
 
-      if (this.direction.dx < 0.1 && this.direction.dy < 0.1) {
+      // Not sure what this was for but I made it use abs value because bullets aiming in negative x and negative y direction were being removed
+      if (Math.abs(this.direction.dx) < 0.1 && Math.abs(this.direction.dy) < 0.1) {
         let idx = gameModel.activeBullets.findIndex(b => b.id === this.id);
         gameModel.activeBullets.splice(idx, 1);
       }
-
-
     }
   }
 }
