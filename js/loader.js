@@ -28,10 +28,19 @@
                         if (onError) { onError('Unknown file extension: ' + fileExtension); }
                     }
                     if (xhr.responseType === 'blob') {
-                        asset.onload = function() {
-                            window.URL.revokeObjectURL(asset.src);
-                            if (onSuccess) { onSuccess(asset); }
-                        };
+                        if (fileExtension === 'mp3') {
+                            asset.oncanplaythrough = function() {
+                                asset.oncanplaythrough = null;  // Ugh, what a hack!
+                                window.URL.revokeObjectURL(asset.src);
+                                if (onSuccess) { onSuccess(asset); }
+                            };
+                        }
+                        else {  // not terrific assumption that it has an 'onload' event, but that is what we are doing
+                            asset.onload = function() {
+                                window.URL.revokeObjectURL(asset.src);
+                                if (onSuccess) { onSuccess(asset); }
+                            };
+                        }
                         asset.src = window.URL.createObjectURL(xhr.response);
                     }
                 } else {
@@ -151,6 +160,31 @@
         function(asset) {
             console.log(`heart.png loaded: ${asset.width}, ${asset.height}`);
             gameModel.assets[`heart`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load boom sound
+    loadAsset(
+        `assets/Boom.mp3`,
+        function(asset) {
+            console.log(`Boom.mp3 loaded: ${asset}`);
+            console.log(asset);
+            gameModel.assets[`boomSound`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load pew sound
+    loadAsset(
+        `assets/Pew.mp3`,
+        function(asset) {
+            console.log(`Pew.mp3 loaded: ${asset}}`);
+            gameModel.assets[`pewSound`] = asset;
         },
         function(error) {
             console.log('error: ', error);

@@ -204,6 +204,8 @@ function updateTowerAngle(tower) {
           if (tower.elapsedTime - tower.lastBulletTimeStamp >= 1 / tower.fireRate && tower.name !== 'bomber') {
             let center = {x: tower.center.x, y: tower.center.y};
             let damage = tower.damage;
+            const audioClone = gameModel.assets['pewSound'].cloneNode();
+            audioClone.play();
             gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, color, creep, false, damage, type, bomb));
             gameModel.bulletId++;
             tower.lastBulletTimeStamp = tower.elapsedTime;
@@ -225,6 +227,8 @@ function updateTowerAngle(tower) {
             let center = {x: tower.center.x, y: tower.center.y};
             let guided = tower.name === 'Air Seeker';
             let damage = tower.damage;
+            const audioClone = gameModel.assets['pewSound'].cloneNode();
+            audioClone.play();
             gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb));
             gameModel.bulletId++;
             tower.lastBulletTimeStamp = tower.elapsedTime;
@@ -529,6 +533,8 @@ function checkCollision(bullet) {
       gameModel.activeBullets.splice(idx, 1);
       gameModel.activeCreeps[i].currentHealth -= bullet.damage;
       if (bullet.bomb) {
+        const audioClone = gameModel.assets['boomSound'].cloneNode();
+        audioClone.play();
         gameModel.explosionParticleSystems.push(
           ParticleSystem({
             center: bullet.center,
