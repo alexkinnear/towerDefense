@@ -29,8 +29,8 @@ const doesntBlockPath = (tower) => {
     gameModel.grid[towerGrid.row][towerGrid.col].pop();
     return false;
   }
-  let leftToRight = getShortestPath(gp['left'], gp['right']).length > 0;
-  let topToBottom = getShortestPath(gp['top'], gp['bottom']).length > 0;
+  let leftToRight = getShortestPath(gp['left'], gp['right'], false).length > 0;
+  let topToBottom = getShortestPath(gp['top'], gp['bottom'], false).length > 0;
   gameModel.grid[towerGrid.row][towerGrid.col].pop();
   return leftToRight && topToBottom;
 }

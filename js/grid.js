@@ -70,8 +70,24 @@ function getPath(visited) {
     return path;
 }
 
+function getShortestAirPath(start, end) {
+    let temp = JSON.parse(JSON.stringify(gameModel.grid));
+    for (let i = 0; i > gameModel.GRID_SIZE; i++) {
+        for (let j = 0; j < gameModel.GRID_SIZE; j++) {
+            gameModel.grid[i][j] = [];
+        }
+    }
+    let path = getShortestPath(start, end, false);
+    gameModel.grid = temp;
+    return path;
+}
+
 // Greedy solution that returns objects with position of the shortest path
-function getShortestPath(start, end) {
+function getShortestPath(start, end, air) {
+    if (air) {
+        return getShortestAirPath(start, end);
+    }
+
     if (!isOpenSpace(start.row, start.col) || !isOpenSpace(end.row, end.col)) {
         return [];
     }

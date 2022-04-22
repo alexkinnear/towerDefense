@@ -116,6 +116,8 @@ const initializeGameModel = () => {
         if (gameModel.selectedTower) {
           gameModel.currentMoney += Math.round(gameModel.selectedTower.price * 0.7);
           const idx = gameModel.activeTowers.indexOf(gameModel.selectedTower);
+          let gridPos = convertCanvasLocationToGridPos(gameModel.activeTowers[idx].center);
+          gameModel.grid[gridPos.row][gridPos.col].pop();
           gameModel.explosionParticleSystems.push(
             ParticleSystem({
               center: { x: gameModel.selectedTower.center.x, y: gameModel.selectedTower.center.y },
@@ -169,16 +171,16 @@ const initializeGameModel = () => {
             this.currentLevel.finished = true;
             this.startLevel = false;
             // create next level
-            let id = this.currentLevel + 1;
+            this.levelNum++;
             let openings = ['left', 'right', 'top', 'bottom'];
-            let entrance = id === 2 ? 'top' : openings[Math.floor(Math.random() * openings.length)];
+            let entrance = this.levelNum === 2 ? 'top' : openings[Math.floor(Math.random() * openings.length)];
             let idx = openings.findIndex(x => x === entrance);
             openings.splice(idx, 1);
-            let exit = id === 2 ? 'bottom' : openings[Math.floor(Math.random() * openings.length)];
+            let exit = this.levelNum === 2 ? 'bottom' : openings[Math.floor(Math.random() * openings.length)];
             let numCreeps = this.currentLevel.numCreeps * 1.5;  // Increase number of creeps by 50%
             let duration = this.currentLevel.duration * 1.2;  // Increase duration by 20%
-            this.currentLevel = createLevel(id, entrance, exit, numCreeps, duration, this.currentLevel.waves);
-            this.levelNum++;
+            this.currentLevel = createLevel(this.levelNum, entrance, exit, numCreeps, duration, this.currentLevel.waves);
+
         }
 
         if (this.lives < 1) {

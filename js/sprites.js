@@ -90,10 +90,10 @@ function updateCreepPaths() {
     if (gameModel.activeCreeps[i].type === 'ground') {
       let creep = gameModel.activeCreeps[i];
       if (creep.gridPos.row === -1) {
-        creep.path = getShortestPath(gameModel.currentLevel.entrance, gameModel.currentLevel.exit);
+        creep.path = getShortestPath(gameModel.currentLevel.entrance, gameModel.currentLevel.exit, false);
       }
       else {
-        creep.path = getShortestPath(creep.gridPos, gameModel.currentLevel.exit);
+        creep.path = getShortestPath(creep.gridPos, gameModel.currentLevel.exit, false);
       }
       creep.path.unshift('end');
     }
@@ -589,7 +589,7 @@ const bullet = (id, pos, radius, color, target, guided, damage, type, bomb) => {
         gameModel.activeBullets.splice(idx, 1);
       }
 
-      if (this.direction.dx < 0.001 && this.direction.dy < 0.001) {
+      if (this.direction.dx < 0.1 && this.direction.dy < 0.1) {
         let idx = gameModel.activeBullets.findIndex(b => b.id === this.id);
         gameModel.activeBullets.splice(idx, 1);
       }
