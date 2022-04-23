@@ -231,6 +231,12 @@ function updateTowerAngle(tower) {
             audioClone.play();
             gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb, tower.effect));
             gameModel.bulletId++;
+            if (tower.effect === 'Rapid Shot') {
+              setTimeout(() => {
+                gameModel.activeBullets.push(bullet(gameModel.bulletId, {x: tower.center.x, y: tower.center.y}, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb, tower.effect));
+                gameModel.bulletId++;
+              }, 100)
+            }
             tower.lastBulletTimeStamp = tower.elapsedTime;
           }
         }
@@ -310,7 +316,7 @@ const creep = (pos, assetName, maxHealth) => {
 
       if (this.timeLeftOnCurrFrame <= 0) {
         if (this.poisoned) {
-          this.currentHealth -= 1;
+          this.currentHealth -= 2;
         }
         this.animationIndex = this.animationIndex + 1;
         if (this.animationIndex === this.numOfFrames + 1) {
@@ -538,25 +544,25 @@ function outOfBounds(obj) {
   return (obj.x < gameModel.GRID_OFFSET || obj.y < gameModel.GRID_OFFSET || obj.x > canvas.width - gameModel.GRID_OFFSET || obj.y > canvas.height - gameModel.GRID_OFFSET);
 }
 
-function checkCollision(bullet) {
+function checkCollision(currBullet) {
   for (let i = 0; i < gameModel.activeCreeps.length; i++) {
-    if (collision(bullet, gameModel.activeCreeps[i])) {
-      let idx = gameModel.activeBullets.findIndex(b => b.id === bullet.id);
+    if (collision(currBullet, gameModel.activeCreeps[i])) {
+      let idx = gameModel.activeBullets.findIndex(b => b.id === currBullet.id);
       gameModel.activeBullets.splice(idx, 1);
       const creepHit = gameModel.activeCreeps[i];
       const creepsHit = [];
       creepsHit.push(creepHit);
-      if (bullet.bomb) {
+      if (currBullet.bomb) {
         for (let j = 0; j < gameModel.activeCreeps.length; j++) {
-          if (distance(bullet.center, gameModel.activeCreeps[j].center) < canvas.width / 16 && gameModel.activeCreeps[j].id !== creepHit.id) {
+          if (distance(currBullet.center, gameModel.activeCreeps[j].center) < canvas.width / 16 && gameModel.activeCreeps[j].id !== creepHit.id) {
             creepsHit.push(gameModel.activeCreeps[j]);
           }
         }
         for (let k = 0; k < creepsHit.length; k++) {
           let creepHit = creepsHit[k];
-          creepHit.currentHealth -= bullet.damage;
-          if (bullet.effect !== null) {
-            switch (bullet.effect) {
+          creepHit.currentHealth -= currBullet.damage;
+          if (currBullet.effect !== null) {
+            switch (currBullet.effect) {
               case 'Slow':
                 if (!creepHit.slowed) {
                   creepHit.speed *= 0.6;
@@ -582,9 +588,9 @@ function checkCollision(bullet) {
       }
       else {
         let creepHit = gameModel.activeCreeps[i];
-        creepHit.currentHealth -= bullet.damage;
-        if (bullet.effect !== null) {
-          switch (bullet.effect) {
+        creepHit.currentHealth -= currBullet.damage;
+        if (currBullet.effect !== null) {
+          switch (currBullet.effect) {
             case 'Slow':
               if (!creepHit.slowed) {
                 creepHit.speed *= 0.6;
@@ -608,26 +614,51 @@ function checkCollision(bullet) {
         }
       }
 
-      if (bullet.bomb) {
+      if (currBullet.bomb) {
         const audioClone = gameModel.assets['boomSound'].cloneNode();
         audioClone.play();
         gameModel.explosionParticleSystems.push(
             ParticleSystem({
-              center: bullet.center,
-              size: { mean: 4, stdev: 2 },
-              speed: { mean: 200, stdev: 40 },
-              lifetime: { mean: 0.2, stdev: 0.1 },
+              center: currBullet.center,
+              size: { mean: 10, stdev: 2 },
+              speed: { mean: 130, stdev: 40 },
+              lifetime: { mean: 0.3, stdev: 0.1 },
               assetName: 'fireworkParticle',
               duration: 0.2
             }),
         );
+
+        if (currBullet.effect === 'Shrapnel') {
+          const directions = [{dx: 1, dy: 1}, {dx: -1, dy: 1}, {dx: 1, dy: -1}, {dx: -1, dy: -1}];
+
+          for (let direction of directions) {
+            let shrapnel = bullet(gameModel.bulletId, {x: currBullet.center.x, y: currBullet.center.y},
+              currBullet.radius, '#999999', currBullet.target, false, 15, 'ground', false, null);
+            shrapnel.direction = direction;
+            shrapnel.speed = 10;
+            gameModel.bulletId++;
+            gameModel.activeBullets.push(shrapnel);
+          }
+        }
+        else if (currBullet.effect === 'Cluster Bomb') {
+          const directions = [{dx: 1, dy: 1}, {dx: -1, dy: 1}, {dx: 1, dy: -1}, {dx: -1, dy: -1}];
+
+          for (let direction of directions) {
+            let shrapnel = bullet(gameModel.bulletId, {x: currBullet.center.x, y: currBullet.center.y},
+              currBullet.radius, '#999999', currBullet.target, false, 10, 'ground', true, null);
+            shrapnel.direction = direction;
+            shrapnel.speed = 10;
+            gameModel.bulletId++;
+            gameModel.activeBullets.push(shrapnel);
+          }
+        }
       }
-      else if (bullet.guided) {
+      else if (currBullet.guided) {
         ParticleSystem({
-          center: bullet.center,
-          size: { mean: 4, stdev: 2 },
-          speed: { mean: 200, stdev: 40 },
-          lifetime: { mean: 0.2, stdev: 0.1 },
+          center: currBullet.center,
+          size: { mean: 10, stdev: 2 },
+          speed: { mean: 100, stdev: 40 },
+          lifetime: { mean: 0.4, stdev: 0.1 },
           assetName: 'greenExplosionParticle',
           duration: 0.2
         })

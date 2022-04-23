@@ -237,7 +237,7 @@ const initializeGameModel = () => {
                 gameModel.explosionParticleSystems.push(
                   ParticleSystem({
                     center: bullet.center,
-                    size: { mean: 0.5, stdev: 0.25 },
+                    size: { mean: 2, stdev: 0.25 },
                     speed: { mean: 200, stdev: 40 },
                     lifetime: { mean: 0.1, stdev: 0.05 },
                     assetName: 'fireworkParticle',
@@ -249,7 +249,7 @@ const initializeGameModel = () => {
                 gameModel.explosionParticleSystems.push(
                     ParticleSystem({
                         center: bullet.center,
-                        size: { mean: 0.5, stdev: 0.25 },
+                        size: { mean: 2, stdev: 0.25 },
                         speed: { mean: 200, stdev: 40 },
                         lifetime: { mean: 0.1, stdev: 0.05 },
                         assetName: 'greenExplosionParticle',
