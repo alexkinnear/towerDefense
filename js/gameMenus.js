@@ -48,6 +48,8 @@ const attemptToPlace = (tower) => {
       gameModel.currentLevel.exit = gp[gameModel.currentLevel.exitString];
       gameModel.currentLevel.exit = gp[gameModel.currentLevel.exitString];
       updateCreepPaths();
+      const audioClone = gameModel.assets['towerUpgrade'].cloneNode();
+      audioClone.play();
 
     }
   }

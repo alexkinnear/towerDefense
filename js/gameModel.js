@@ -37,6 +37,26 @@ const initializeGameModel = () => {
       this.levelNum = 1;
       this.startLevel = false;
       this.loadKeys();
+      this.audio = gameModel.assets['backgroundMusic'];
+      this.initializeBackgroundMusic();
+      this.playBackgroundMusic = true;
+    },
+
+    initializeBackgroundMusic() {
+        this.audio.play();
+        this.audio.volume = 0.3;
+        this.audio.loop = true;
+    },
+
+    toggleMusic() {
+        this.playBackgroundMusic = !this.playBackgroundMusic;
+        if (this.playBackgroundMusic) {
+            gameModel.audio.pause();
+        }
+        else {
+            gameModel.audio.play();
+        }
+
     },
 
     loadKeys() {
@@ -132,6 +152,8 @@ const initializeGameModel = () => {
           );
           gameModel.activeTowers.splice(idx, 1);
           gameModel.selectedTower = null;
+          const audioClone = gameModel.assets['sellTower'].cloneNode();
+          audioClone.play();
         }
     },
 
