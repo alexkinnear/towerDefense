@@ -420,14 +420,14 @@ const gunnerSpec = {
   groundRange: 200,
   damage: 10,
   fireRate: 2,
-  price: 25,
+  price: 70,
   effect: null,
   name: 'Gunner',
   sprites: ['turret-4-1', 'turret-4-2', 'turret-4-3'],
   upgradePaths: [
-    [{damage: 15, price: 25}, {effect: 'Slow', price: 40}], // path 0
-    [{fireRate: 3, price: 25}, {effect: 'Triple Shot', price: 50}], // path 1
-    [{groundRange: 250, price: 25}, {groundRange: 300, price: 30}], // path 2
+    [{damage: 15, price: 150}, {effect: 'Slow', price: 250}], // path 0
+    [{fireRate: 3, price: 150}, {effect: 'Triple Shot', price: 220}], // path 1
+    [{groundRange: 250, price: 100}, {groundRange: 300, price: 110}], // path 2
   ],
 }
 const bomberSpec = {
@@ -435,14 +435,14 @@ const bomberSpec = {
   groundRange: 200,
   damage: 40,
   fireRate: 0.5,
-  price: 90,
+  price: 250,
   effect: 'Explodes',
   name: 'Bomber',
   sprites: ['turret-3-1', 'turret-3-2', 'turret-3-3'],
   upgradePaths: [
-    [{damage: 60, price: 80}, {effect: 'Shrapnel', price: 120}], // path 0
-    [{fireRate: 1, price: 100}, {effect: 'Poison Bomb', price: 130}], // path 1
-    [{groundRange: 250, price: 50}, {effect: 'Cluster Bomb', price: 150}], // path 2
+    [{damage: 60, price: 220}, {effect: 'Shrapnel', price: 300}], // path 0
+    [{fireRate: 1, price: 210}, {effect: 'Poison Bomb', price: 500}], // path 1
+    [{groundRange: 250, price: 180}, {effect: 'Cluster Bomb', price: 1337}], // path 2
   ],
 }
 const airSeekerSpec = {
@@ -450,14 +450,14 @@ const airSeekerSpec = {
   groundRange: null,
   damage: 30,
   fireRate: 1,
-  price: 70,
+  price: 140,
   effect: null,
   name: 'Air Seeker',
   sprites: ['turret-5-1', 'turret-5-2', 'turret-5-3'],
   upgradePaths: [
-    [{damage: 50, price: 80}, {airRange: 325, price: 80}], // path 0
-    [{fireRate: 1.5, price: 50}, {effect: 'Rapid Shot', price: 120}], // path 1
-    [{airRange: 300, price: 80}, {effect: 'Sonic Missiles', price: 50}], // path 2
+    [{damage: 50, price: 130}, {airRange: 325, price: 180}], // path 0
+    [{fireRate: 1.5, price: 120}, {effect: 'Rapid Shot', price: 250}], // path 1
+    [{airRange: 300, price: 140}, {effect: 'Sonic Missiles', price: 150}], // path 2
   ],
 }
 const heatSeekerSpec = {
@@ -465,14 +465,14 @@ const heatSeekerSpec = {
   groundRange: 175,
   damage: 25,
   fireRate: 1.2,
-  price: 140,
+  price: 210,
   effect: null,
   name: 'Heat Seeker',
   sprites: ['turret-7-1', 'turret-7-2', 'turret-7-3'],
   upgradePaths: [
-    [{damage: 40, price: 80}, {airRange: 300, price: 110}], // path 0
-    [{groundRange: 250, price: 70}, {airRange: 300, price: 120}], // path 1
-    [{airRange: 275, price: 80}, {damage: 50, price: 120}], // path 2
+    [{damage: 40, price: 200}, {airRange: 300, price: 180}], // path 0
+    [{groundRange: 250, price: 160}, {airRange: 300, price: 180}], // path 1
+    [{airRange: 275, price: 140}, {damage: 50, price: 240}], // path 2
   ],
 }
 
