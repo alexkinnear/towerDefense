@@ -281,8 +281,9 @@ const creep = (pos, assetName, maxHealth) => {
 
       if (this.currentHealth <= 0) {
         let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
-        
         gameModel.activeCreeps.splice(idx, 1);
+        const audioClone = gameModel.assets['creepDeath'].cloneNode();
+        audioClone.play();
         if (!gameModel.gameOver) {
           gameModel.currentMoney += this.killValue;
           gameModel.score += this.maxHealth;
@@ -381,6 +382,8 @@ const tower = (pos,
           this.chosenUpgradePath = upgradePath;
         }
         gameModel.selectedTowerMenu = initializeSelectedTowerMenu(this);
+        const audioClone = gameModel.assets['towerUpgrade'].cloneNode();
+        audioClone.play();
       }
     }
   }

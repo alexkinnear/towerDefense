@@ -213,6 +213,55 @@
             console.log('error: ', error);
         }
     );
+
+    // load background music
+    loadAsset(
+        `assets/backgroundMusic.mp3`,
+        function(asset) {
+            console.log(`backgroundMusic.mp3 loaded: ${asset}}`);
+            gameModel.assets[`backgroundMusic`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load creepDeath sound
+    loadAsset(
+        `assets/creepDeath.mp3`,
+        function(asset) {
+            console.log(`creepDeath.mp3 loaded: ${asset}}`);
+            gameModel.assets[`creepDeath`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load towerUpgrade
+    loadAsset(
+        `assets/towerUpgrade.mp3`,
+        function(asset) {
+            console.log(`towerUpgrade.mp3 loaded: ${asset}}`);
+            gameModel.assets[`towerUpgrade`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
+    // load sellTower
+    loadAsset(
+        `assets/sellTower.mp3`,
+        function(asset) {
+            console.log(`sellTower.mp3 loaded: ${asset}}`);
+            gameModel.assets[`sellTower`] = asset;
+        },
+        function(error) {
+            console.log('error: ', error);
+        }
+    );
+
     
 
 }());

@@ -5,7 +5,7 @@ function createCreep(creepType, color, creepHealth) {
 
 function createCreeps(howMany) {
     let creeps = [];
-    const creepTypes = gameModel.levelNum > 1 ? 3 : 2;
+    const creepTypes = gameModel.levelNum > 2 ? 3 : 2;
     const creepColors = ['blue', 'green', 'red', 'yellow'];
     const creepHealth = {
         'blue': 50,

@@ -4,7 +4,6 @@ let context = canvas.getContext('2d');
 // The gameModel is created at startup and
 let gameModel = initializeGameModel();
 
-
 // Any active events are updated
 function update() {
     gameModel.update(elapsedTime);
@@ -29,3 +28,4 @@ function gameLoop(timeStamp) {
 
 setupMenuButtons(gameModel);
 // The gameloop will start when the new game button is clicked on the main menu
+

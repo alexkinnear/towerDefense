@@ -76,7 +76,6 @@ const setupMenuButtons = (game) => {
 
   newGame.addEventListener('click', (e) => {
     console.log("starting new game");
-
     setScreen(gameScreen);
     gameModel.newGame();
     prevTime = performance.now();
@@ -209,6 +208,7 @@ const setupMenuButtons = (game) => {
   let path3Key = '3';
   let sellKey = 's';
   let nextLevelKey = 'g';
+  let musicKey = 'm';
   if (localStorage['path1']) {
     path1Key = localStorage['path1'];
   }
@@ -235,11 +235,15 @@ const setupMenuButtons = (game) => {
   sell.innerHTML = `Sell selected tower: ${keyToText(sellKey)}`;
   gameModel.keyboard.registerKey(nextLevelKey, gameModel.startNextLevel, 'nextLevelKey');
   nextLevel.innerHTML = `Start the next level: ${keyToText(nextLevelKey)}`;
+  gameModel.keyboard.registerKey(musicKey, gameModel.toggleMusic, 'toggleMusic');
 
   // Set up the excape key to exit the game
   const exitGame = () => {
     if (gameModel.isRunning) {
       console.log('exiting gameloop');
+      gameModel.playBackgroundMusic = false;
+      gameModel.audio.currentTime = 0;
+      gameModel.audio.pause();
       gameModel.isRunning = false;
       setScreen(main.htmlElement);
     }
