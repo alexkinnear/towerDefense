@@ -219,7 +219,8 @@ const initializeGameModel = () => {
             let exit = this.levelNum === 2 ? 'bottom' : openings[Math.floor(Math.random() * openings.length)];
             let numCreeps = this.currentLevel.numCreeps * 1.5;  // Increase number of creeps by 50%
             let duration = this.currentLevel.duration * 1.2;  // Increase duration by 20%
-            this.currentLevel = createLevel(this.levelNum, entrance, exit, numCreeps, duration, this.currentLevel.waves);
+            this.currentLevel = createLevel(this.levelNum, entrance, exit, numCreeps, duration, Math.floor(duration / 15));
+            console.log(this.currentLevel);
 
         }
 

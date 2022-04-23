@@ -50,6 +50,7 @@ const attemptToPlace = (tower) => {
       updateCreepPaths();
       const audioClone = gameModel.assets['towerUpgrade'].cloneNode();
       audioClone.play();
+      console.log(gameModel.activeCreeps);
 
     }
   }

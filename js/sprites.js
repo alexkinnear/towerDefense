@@ -203,11 +203,18 @@ function updateTowerAngle(tower) {
           // Add bullets at increment of fire rate
           if (tower.elapsedTime - tower.lastBulletTimeStamp >= 1 / tower.fireRate && tower.name !== 'bomber') {
             let center = {x: tower.center.x, y: tower.center.y};
+            let direction = getDirection(center, creep.center, 3);
             let damage = tower.damage;
             const audioClone = gameModel.assets['pewSound'].cloneNode();
             audioClone.play();
-            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, color, creep, false, damage, type, bomb, tower.effect));
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, color, creep, false, damage, type, bomb, tower.effect, direction));
             gameModel.bulletId++;
+            if (tower.effect === 'Triple Shot') {
+              gameModel.activeBullets.push(bullet(gameModel.bulletId, {x: center.x - 1, y: center.y - 1}, 5, color, creep, false, damage, type, bomb, tower.effect, {dx: direction.dx + 3, dy: direction.dy + 3}));
+              gameModel.bulletId++;
+              gameModel.activeBullets.push(bullet(gameModel.bulletId, {x: center.x + 1, y: center.y + 1}, 5, color, creep, false, damage, type, bomb, tower.effect, {dx: direction.dx - 3, dy: direction.dy - 3}));
+              gameModel.bulletId++;
+            }
             tower.lastBulletTimeStamp = tower.elapsedTime;
           }
         }
@@ -225,15 +232,16 @@ function updateTowerAngle(tower) {
           // Add bullets at increment of fire rate
           if (tower.elapsedTime - tower.lastBulletTimeStamp >= 1 / tower.fireRate && tower.name !== 'bomber') {
             let center = {x: tower.center.x, y: tower.center.y};
+            let direction = getDirection(center, creep.center, 3);
             let guided = tower.name === 'Air Seeker';
             let damage = tower.damage;
             const audioClone = gameModel.assets['pewSound'].cloneNode();
             audioClone.play();
-            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb, tower.effect));
+            gameModel.activeBullets.push(bullet(gameModel.bulletId, center, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb, tower.effect, direction));
             gameModel.bulletId++;
             if (tower.effect === 'Rapid Shot') {
               setTimeout(() => {
-                gameModel.activeBullets.push(bullet(gameModel.bulletId, {x: tower.center.x, y: tower.center.y}, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb, tower.effect));
+                gameModel.activeBullets.push(bullet(gameModel.bulletId, {x: tower.center.x, y: tower.center.y}, 5, 'rgba(255, 0, 0)', creep, guided, damage, type, bomb, tower.effect, direction));
                 gameModel.bulletId++;
               }, 100)
             }
@@ -285,6 +293,11 @@ const creep = (pos, assetName, maxHealth) => {
         }
       }
 
+      if (this.path.length === 0) {
+        let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
+        gameModel.activeCreeps.splice(idx, 1);
+      }
+
       if (this.currentHealth <= 0) {
         let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
         gameModel.activeCreeps.splice(idx, 1);
@@ -307,12 +320,11 @@ const creep = (pos, assetName, maxHealth) => {
         );
       }
 
-      if (typeof this.canvasEnd !== 'undefined') {
-        if (Math.abs(this.center.x - this.canvasEnd.x) < 0.5 && Math.abs(this.center.y - this.canvasEnd.y) < 0.5) {
-          let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
-          gameModel.activeCreeps.splice(idx, 1);
-          gameModel.lives -= 1;
-        }
+
+      if (distance(this.center, convertGridPosToCanvasLocation(gameModel.currentLevel.exit)) < 0.1) {
+        let idx = gameModel.activeCreeps.findIndex(creep => creep.id === this.id);
+        gameModel.activeCreeps.splice(idx, 1);
+        gameModel.lives -= 1;
       }
 
       if (this.timeLeftOnCurrFrame <= 0) {
@@ -510,10 +522,6 @@ function getDirection(pt1, pt2, velocity) {
 }
 
 function updateBulletPos(bullet) {
-  // Move bullet toward creep and remove from gameModel.activeBullets on impact
-  // let direction = getDirection(bullet.center, bullet.target.center, bullet.speed);
-  // bullet.center.x += direction.dx;
-  // bullet.center.y += direction.dy;
   let diffx = Math.abs(bullet.center.x - bullet.target.center.x);
   let diffy = Math.abs(bullet.center.y - bullet.target.center.y);
 
@@ -633,10 +641,10 @@ function checkCollision(currBullet) {
 
         if (currBullet.effect === 'Shrapnel') {
           const directions = [{dx: 1, dy: 1}, {dx: -1, dy: 1}, {dx: 1, dy: -1}, {dx: -1, dy: -1}];
-
+          let d = getDirection(currBullet.center, currBullet.target.center, 3);
           for (let direction of directions) {
             let shrapnel = bullet(gameModel.bulletId, {x: currBullet.center.x, y: currBullet.center.y},
-              currBullet.radius, '#999999', currBullet.target, false, 15, 'ground', false, null);
+              currBullet.radius, '#999999', currBullet.target, false, 15, 'ground', false, null, d);
             shrapnel.direction = direction;
             shrapnel.speed = 10;
             gameModel.bulletId++;
@@ -645,10 +653,10 @@ function checkCollision(currBullet) {
         }
         else if (currBullet.effect === 'Cluster Bomb') {
           const directions = [{dx: 1, dy: 1}, {dx: -1, dy: 1}, {dx: 1, dy: -1}, {dx: -1, dy: -1}];
-
+          let d = getDirection(currBullet.center, currBullet.target.center, 3);
           for (let direction of directions) {
             let shrapnel = bullet(gameModel.bulletId, {x: currBullet.center.x, y: currBullet.center.y},
-              currBullet.radius, '#999999', currBullet.target, false, 10, 'ground', true, null);
+              currBullet.radius, '#999999', currBullet.target, false, 10, 'ground', true, null, d);
             shrapnel.direction = direction;
             shrapnel.speed = 10;
             gameModel.bulletId++;
@@ -670,7 +678,7 @@ function checkCollision(currBullet) {
   }
 }
 
-const bullet = (id, pos, radius, color, target, guided, damage, type, bomb, effect) => {
+const bullet = (id, pos, radius, color, target, guided, damage, type, bomb, effect, direction) => {
   let speed = 3;
   if (effect === 'Sonic Missiles') {
     speed = 10;
@@ -687,7 +695,7 @@ const bullet = (id, pos, radius, color, target, guided, damage, type, bomb, effe
     effect: effect,
     target: guided ? target : JSON.parse(JSON.stringify(target)),
     guided: guided,
-    direction: getDirection(pos, target.center, 3),
+    direction: direction,
     update(elapsedTime) {
       if (this.guided) {
         updateBulletPos(this);
@@ -704,7 +712,6 @@ const bullet = (id, pos, radius, color, target, guided, damage, type, bomb, effe
         gameModel.activeBullets.splice(idx, 1);
       }
 
-      // Not sure what this was for but I made it use abs value because bullets aiming in negative x and negative y direction were being removed
       if (Math.abs(this.direction.dx) < 0.1 && Math.abs(this.direction.dy) < 0.1) {
         let idx = gameModel.activeBullets.findIndex(b => b.id === this.id);
         gameModel.activeBullets.splice(idx, 1);
